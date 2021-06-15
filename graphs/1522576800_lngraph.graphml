@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d16" for="edge" attr.name="cltv_expiry_delta" attr.type="int" />
+  <key id="d15" for="edge" attr.name="htlc_minimim_msat" attr.type="int" />
+  <key id="d14" for="edge" attr.name="fee_proportional_millionths" attr.type="int" />
+  <key id="d13" for="edge" attr.name="fee_base_msat" attr.type="int" />
+  <key id="d12" for="edge" attr.name="features" attr.type="string" />
+  <key id="d11" for="edge" attr.name="timestamp" attr.type="int" />
+  <key id="d10" for="edge" attr.name="destination" attr.type="string" />
+  <key id="d9" for="edge" attr.name="source" attr.type="string" />
+  <key id="d8" for="edge" attr.name="scid" attr.type="string" />
+  <key id="d7" for="node" attr.name="in_degree" attr.type="int" />
+  <key id="d6" for="node" attr.name="out_degree" attr.type="int" />
+  <key id="d5" for="node" attr.name="addresses" attr.type="string" />
+  <key id="d4" for="node" attr.name="alias" attr.type="string" />
+  <key id="d3" for="node" attr.name="rgb_color" attr.type="string" />
+  <key id="d2" for="node" attr.name="features" attr.type="string" />
+  <key id="d1" for="node" attr.name="timestamp" attr.type="int" />
+  <key id="d0" for="node" attr.name="id" attr.type="string" />
+  <graph edgedefault="directed">
+    <node id="02d97e94cfeedca2a3da47acb400bc6836e671b3cb3fc05bdd6993acd64483d09a">
+      <data key="d0">02d97e94cfeedca2a3da47acb400bc6836e671b3cb3fc05bdd6993acd64483d09a</data>
+      <data key="d1">1521331315</data>
+      <data key="d2" />
+      <data key="d3">3399ff</data>
+      <data key="d4">02d97e94cfeedca2a3da</data>
+      <data key="d5" />
+      <data key="d6">1</data>
+      <data key="d7">0</data>
+    </node>
+    <node id="0246dae073f563308943c44f4d072f226f4968ea6a5a82079e9bfc9860a8a620f9">
+      <data key="d0">0246dae073f563308943c44f4d072f226f4968ea6a5a82079e9bfc9860a8a620f9</data>
+      <data key="d1">1521812723</data>
+      <data key="d2" />
+      <data key="d3">f0a000</data>
+      <data key="d4">pokatoo</data>
+      <data key="d5">ipv4://149.202.71.189:9735</data>
+      <data key="d6">1</data>
+      <data key="d7">0</data>
+    </node>
+    <node id="028bbe4e7a85ccff3987deee238fd69732a8e9e621d7e594398062d8bec2a3c571">
+      <data key="d0">028bbe4e7a85ccff3987deee238fd69732a8e9e621d7e594398062d8bec2a3c571</data>
+      <data key="d1">1521849850</data>
+      <data key="d2" />
+      <data key="d3">3399ff</data>
+      <data key="d4">028bbe4e7a85ccff3987</data>
+      <data key="d5">ipv4://69.181.66.7:9735</data>
+      <data key="d6">1</data>
+      <data key="d7">0</data>
+    </node>
+    <node id="03ac27acff678ce4a2f25756612d3a83e2cb4d7552db168d3bb15482b92c80215f">
+      <data key="d0">03ac27acff678ce4a2f25756612d3a83e2cb4d7552db168d3bb15482b92c80215f</data>
+      <data key="d1">1522007213</data>
+      <data key="d2" />
+      <data key="d3">00cc7a</data>
+      <data key="d4">skyrus.net</data>
+      <data key="d5">ipv4://47.189.73.170:9735</data>
+      <data key="d6">1</data>
+      <data key="d7">0</data>
+    </node>
+    <node id="0265fae305778b7cb157365f70cf3a2047d2cad5c1ccc5f550c6d8a033084a8ea5">
+      <data key="d0">0265fae305778b7cb157365f70cf3a2047d2cad5c1ccc5f550c6d8a033084a8ea5</data>
+      <data key="d1">1571649969</data>
+      <data key="d2">2200</data>
+      <data key="d3">3399ff</data>
+      <data key="d4">ln.taborsky.cz</data>
+      <data key="d5">ipv4://37.205.8.78:9735,torv3://b'\xb1\xbeDk\t\xa5\xb6\xda\x12\xc2\x87\x14-\x96\xd4\xc0_\xb35\x00\x85\r\xa7&gt;\xcc#MU\xfb\xb8kS]\x11\x03':9735</data>
+      <data key="d6">0</data>
+      <data key="d7">1</data>
+    </node>
+    <node id="032c4b954f0f171b694b5e8e8323589e54196b48cf2efc27692513a360cb11d76f">
+      <data key="d0">032c4b954f0f171b694b5e8e8323589e54196b48cf2efc27692513a360cb11d76f</data>
+      <data key="d1">1599830749</data>
+      <data key="d2" />
+      <data key="d3">56a580</data>
+      <data key="d4">nute.net</data>
+      <data key="d5">ipv4://79.137.115.56:9735</data>
+      <data key="d6">0</data>
+      <data key="d7">1</data>
+    </node>
+    <node id="0327049d8d63f0c40193cdf3afc61817c8647808a4e482de0716fcef74e6d92ebf">
+      <data key="d0">0327049d8d63f0c40193cdf3afc61817c8647808a4e482de0716fcef74e6d92ebf</data>
+      <data key="d1">1581617008</data>
+      <data key="d2">02a2a1</data>
+      <data key="d3">42f45d</data>
+      <data key="d4">https://brndn.io/</data>
+      <data key="d5">ipv4://130.211.193.179:9735</data>
+      <data key="d6">0</data>
+      <data key="d7">1</data>
+    </node>
+    <node id="03fab7f8655169ea77d9691d4bd359e97782cb6177a6f76383994ed9c262af97a5">
+      <data key="d0">03fab7f8655169ea77d9691d4bd359e97782cb6177a6f76383994ed9c262af97a5</data>
+      <data key="d1">1609742990</data>
+      <data key="d2">0aa2a1</data>
+      <data key="d3">83b166</data>
+      <data key="d4">webworker.sh</data>
+      <data key="d5">ipv4://158.69.255.49:9735</data>
+      <data key="d6">0</data>
+      <data key="d7">1</data>
+    </node>
+    <edge source="02d97e94cfeedca2a3da47acb400bc6836e671b3cb3fc05bdd6993acd64483d09a" target="03fab7f8655169ea77d9691d4bd359e97782cb6177a6f76383994ed9c262af97a5">
+      <data key="d8">513887x1177x0/0</data>
+      <data key="d9">02d97e94cfeedca2a3da47acb400bc6836e671b3cb3fc05bdd6993acd64483d09a</data>
+      <data key="d10">03fab7f8655169ea77d9691d4bd359e97782cb6177a6f76383994ed9c262af97a5</data>
+      <data key="d11">1521522116</data>
+      <data key="d12" />
+      <data key="d13">1000</data>
+      <data key="d14">1</data>
+      <data key="d15">1000</data>
+      <data key="d16">144</data>
+    </edge>
+    <edge source="0246dae073f563308943c44f4d072f226f4968ea6a5a82079e9bfc9860a8a620f9" target="032c4b954f0f171b694b5e8e8323589e54196b48cf2efc27692513a360cb11d76f">
+      <data key="d8">514798x115x0/0</data>
+      <data key="d9">0246dae073f563308943c44f4d072f226f4968ea6a5a82079e9bfc9860a8a620f9</data>
+      <data key="d10">032c4b954f0f171b694b5e8e8323589e54196b48cf2efc27692513a360cb11d76f</data>
+      <data key="d11">1521810524</data>
+      <data key="d12" />
+      <data key="d13">1000</data>
+      <data key="d14">1</data>
+      <data key="d15">1000</data>
+      <data key="d16">144</data>
+    </edge>
+    <edge source="028bbe4e7a85ccff3987deee238fd69732a8e9e621d7e594398062d8bec2a3c571" target="0327049d8d63f0c40193cdf3afc61817c8647808a4e482de0716fcef74e6d92ebf">
+      <data key="d8">514106x1348x1/0</data>
+      <data key="d9">028bbe4e7a85ccff3987deee238fd69732a8e9e621d7e594398062d8bec2a3c571</data>
+      <data key="d10">0327049d8d63f0c40193cdf3afc61817c8647808a4e482de0716fcef74e6d92ebf</data>
+      <data key="d11">1521849892</data>
+      <data key="d12" />
+      <data key="d13">1000</data>
+      <data key="d14">1</data>
+      <data key="d15">1000</data>
+      <data key="d16">144</data>
+    </edge>
+    <edge source="03ac27acff678ce4a2f25756612d3a83e2cb4d7552db168d3bb15482b92c80215f" target="0265fae305778b7cb157365f70cf3a2047d2cad5c1ccc5f550c6d8a033084a8ea5">
+      <data key="d8">514435x2612x0/1</data>
+      <data key="d9">03ac27acff678ce4a2f25756612d3a83e2cb4d7552db168d3bb15482b92c80215f</data>
+      <data key="d10">0265fae305778b7cb157365f70cf3a2047d2cad5c1ccc5f550c6d8a033084a8ea5</data>
+      <data key="d11">1521957064</data>
+      <data key="d12" />
+      <data key="d13">800</data>
+      <data key="d14">1</data>
+      <data key="d15">1000</data>
+      <data key="d16">144</data>
+    </edge>
+  </graph>
+</graphml>
