@@ -2,14 +2,16 @@ import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import networkit as nk
 from scipy.stats import stats
 
 """
 Fee = fee_base_msat +(amount * fee_proportional_millionths / 10**6)
 """
 
-def calc_betweenness_centrality(g):
-    return nx.betweenness_centrality(g, weight='weight', normalized=False)
+
+def calc_betweenness_centrality(G):
+    return nx.betweenness_centrality(G, weight='weight', normalized=False)
 
 
 def calc_triangles(g):
@@ -44,29 +46,54 @@ def drawHistogram(df_plot):
     # new_plot = df[(df_plot['0'] < max_tresh) & (df_plot['0'] > min_tresh)]
     # print(new_plot)
 
-    binWidth = 0.02
     print(min(df_plot.values), max(df_plot.values))
+
+    binWidth = int(np.sqrt(2200))
+    print(binWidth)
     bins = np.arange(min(df_plot.values), max(df_plot.values) + binWidth, binWidth)
-    df_plot.hist(bins=bins, edgecolor='black', linewidth=1.2)
+    print(bins)
+    # df_plot.hist(bins=bins, edgecolor='black', linewidth=1.2)
     # plt.show()
+    df_plot.boxplot(meanline=True, showfliers=True, showmeans=True)
+    plt.show()
 
-
+print("Creating graph from file")
 g = nx.read_graphml("../graphs/1609498800_lngraph.graphml")
 baseAmount = 1000000000
+G = nx.Graph()
 for edge in g.edges(data=True):
     # Weight = Fee
-    edge[2]['weight'] = edge[2]['fee_base_msat'] + (baseAmount * edge[2]['fee_proportional_millionths'] / 1000000)
+    weight = edge[2]['fee_base_msat'] + (baseAmount * edge[2]['fee_proportional_millionths'] / 1000000)
+    G.add_edge(edge[2]['source'], edge[2]['destination'], weight=weight)
 
-betweenness = calc_betweenness_centrality(g)
+# print("Graph created, proceeding with SP")
+# short_path_set = set()
+# for node in G.nodes:
+#     paths = dict(nx.single_source_shortest_path(G, source=node))
+#     for key in paths:
+#         # print(paths[key])
+#         short_path_set.add(tuple(paths[key]))
+#
+# print("SP finished")
+# print(len(short_path_set))
+
+betweenness = nk.centrality.Betweenness(G)
+# betweenness = calc_betweenness_centrality(G)
 betweenness_filtered = dict()
+print("#Nodes:", len(betweenness))
 for key in betweenness:
     if betweenness[key] != 0:
         betweenness_filtered[key] = betweenness[key]
+print("#Nodes!=0:", len(betweenness_filtered))
+# [7.55031845e-65] [2.24284729e+100]
+
 
 df = pd.DataFrame.from_dict(betweenness_filtered, orient='index')
-df.to_csv('./analysis/betweenness_results' + str(baseAmount) + '_1609498800_filtered',
+df.to_csv('../analysis/betweenness_results/' + str(baseAmount) + '_1609498800_filtered_nw',
           index=False)
 
-# df = pd.read_csv('../analysis/betweenness_results/1000000000_1609498800_filtered')
-# drawHistogram(df)
+df = pd.read_csv('../analysis/betweenness_results/1000000000_1609498800_filtered_nw')
+drawHistogram(df)
+
+
 
