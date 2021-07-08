@@ -1,4 +1,8 @@
+import random
+
 import networkx as nx
+import pandas as pd
+from betweenness import calc_betweenness_centrality
 
 G = nx.Graph()
 # Weight
@@ -37,36 +41,44 @@ G.add_edge("g", "h", weight=2)
 # G.add_edge("e", "j")
 # G.add_edge("f", "j")
 
-# 100
-# {'a': 5.5, 'b': 0.0, 'c': 15.666666666666666, 'g': 3.833333333333333, 'd': 12.166666666666666, 'e': 9.166666666666666, 'f': 2.333333333333333, 'h': 4.333333333333333, 'i': 0.0, 'j': 0.0}
 
-# short_path_set = set()
-# for node in G.nodes:
-#     paths = dict(nx.single_source_shortest_path(G, source=node))
-#     for key in paths:
-#         print(paths[key])
-#         short_path_set.add(tuple(paths[key]))
+print("Creating graph from file")
+g = nx.read_graphml("../graphs/1609498800_lngraph.graphml")
+baseAmount = 10000000000
+G = nx.Graph()
+for edge in g.edges(data=True):
+    # Weight = Fee
+    # weight = edge[2]['fee_base_msat'] + (baseAmount * edge[2]['fee_proportional_millionths'] / 1000000)
+    weight = random.randint(0, baseAmount)
+    G.add_edge(edge[2]['source'], edge[2]['destination'], weight=weight)
 
-# print(short_path_set)
-# print(len(short_path_set))
+print("Calculating betweenness")
+betweenness = calc_betweenness_centrality(G)
+nx.set_node_attributes(G, betweenness, "betweenness")
+nx.write_graphml(G, '../graphs/betweenness/' + str(baseAmount) + '_1609498800.graphml')
 
-# print(nx.single_source_shortest_path(G, source="a"))
-# sh_paths = dict(nx.all_pairs_shortest_path(G))
-# for key in sh_paths:
-#     print(sh_paths[key])
+# G = nx.read_graphml('../graphs/betweenness/' + str(baseAmount) + '_1609498800.graphml')
+node_bt_sorted = sorted(G.nodes, key=lambda x: G.nodes[x]['betweenness'], reverse=True)
 
-# all_pairs = dict(nx.all_pairs_dijkstra_path(G, weight="weight"))
-#
-# count = 0
-# for key in all_pairs:
-#     for key2 in all_pairs[key]:
-#         count += 1
-#
-# # print(count)
+node_dict = dict()
+for node in node_bt_sorted:
+    # print('Node: ', node, 'BT: ', G.nodes[node]['betweenness'], 'D: ', G.degree[node])
+    node_dict[node] = dict()
+    node_dict[node]['betweenness'] = G.nodes[node]['betweenness']
+    node_dict[node]['degree'] = G.degree[node]
 
-bt = nx.betweenness_centrality(G, weight='weight', normalized=False)
-nx.set_node_attributes(G, bt, "betweenness")
-for node in G:
-    print(node[0])
+    adj_nodes = G.adj[node]
+    deg_one_sum, deg_two_sum = 0, 0
+    for key in adj_nodes:
+        deg = G.degree[key]
+        if deg == 1:
+            deg_one_sum += 1
+        elif deg == 2:
+            deg_two_sum += 1
 
+    node_dict[node]['deg_one_percentage'] = (deg_one_sum / G.degree[node])
+    node_dict[node]['deg_two_percentage'] = (deg_two_sum / G.degree[node])
 
+df = pd.DataFrame.from_dict(node_dict, orient='index')
+df.to_csv('../analysis/results/' + str(baseAmount) + '_1609498800.csv',
+          index=True, index_label='node')

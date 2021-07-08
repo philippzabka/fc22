@@ -2,13 +2,11 @@ import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import networkit as nk
 from scipy.stats import stats
 
 """
 Fee = fee_base_msat +(amount * fee_proportional_millionths / 10**6)
 """
-
 
 def calc_betweenness_centrality(G):
     return nx.betweenness_centrality(G, weight='weight', normalized=False)
@@ -25,75 +23,60 @@ def calc_avg_clustering_coefficient(g):
     return nx.average_clustering(g)
 
 def drawHistogram(df_plot):
-    # Z-Score Method
+    pass
     # print(min(df_plot.values), max(df_plot.values))
-    # print(df_plot)
-    # z_scores = stats.zscore(df)
-    # abs_z_scores = np.abs(z_scores)
-    # filtered_entries = (abs_z_scores < 3).all(axis=1)
-    # new_df_plot = df[filtered_entries]
-    # print(min(new_df_plot.values), max(new_df_plot.values))
-
-    #Quantile Method
-    # max_tresh = df_plot['0'].quantile(0.95)
-    # print(max_tresh)
-    # print(df[df_plot['0'] > max_tresh])
     #
-    # min_tresh = df_plot['0'].quantile(0.05)
-    # print(min_tresh)
-    # print(df[df_plot['0'] < min_tresh])
-    #
-    # new_plot = df[(df_plot['0'] < max_tresh) & (df_plot['0'] > min_tresh)]
-    # print(new_plot)
-
-    print(min(df_plot.values), max(df_plot.values))
-
-    binWidth = int(np.sqrt(2200))
-    print(binWidth)
-    bins = np.arange(min(df_plot.values), max(df_plot.values) + binWidth, binWidth)
-    print(bins)
-    # df_plot.hist(bins=bins, edgecolor='black', linewidth=1.2)
+    # binWidth = int(np.sqrt(2200))
+    # print(binWidth)
+    # bins = np.arange(min(df_plot.values), max(df_plot.values) + binWidth, binWidth)
+    # print(bins)
+    # # df_plot.hist(bins=bins, edgecolor='black', linewidth=1.2)
+    # # plt.show()
+    # df_plot.boxplot(meanline=True, showfliers=True, showmeans=True)
     # plt.show()
-    df_plot.boxplot(meanline=True, showfliers=True, showmeans=True)
-    plt.show()
 
-print("Creating graph from file")
-g = nx.read_graphml("../graphs/1609498800_lngraph.graphml")
+# print("Creating graph from file")
+# g = nx.read_graphml("../graphs/1609498800_lngraph.graphml")
 baseAmount = 1000000000
-G = nx.Graph()
-for edge in g.edges(data=True):
-    # Weight = Fee
-    weight = edge[2]['fee_base_msat'] + (baseAmount * edge[2]['fee_proportional_millionths'] / 1000000)
-    G.add_edge(edge[2]['source'], edge[2]['destination'], weight=weight)
+# G = nx.Graph()
+# for edge in g.edges(data=True):
+#     # Weight = Fee
+#     weight = edge[2]['fee_base_msat'] + (baseAmount * edge[2]['fee_proportional_millionths'] / 1000000)
+#     G.add_edge(edge[2]['source'], edge[2]['destination'], weight=weight)
 
-# print("Graph created, proceeding with SP")
-# short_path_set = set()
-# for node in G.nodes:
-#     paths = dict(nx.single_source_shortest_path(G, source=node))
-#     for key in paths:
-#         # print(paths[key])
-#         short_path_set.add(tuple(paths[key]))
-#
-# print("SP finished")
-# print(len(short_path_set))
-
-betweenness = nk.centrality.Betweenness(G)
+# print("Calculating betweenness")
 # betweenness = calc_betweenness_centrality(G)
-betweenness_filtered = dict()
-print("#Nodes:", len(betweenness))
-for key in betweenness:
-    if betweenness[key] != 0:
-        betweenness_filtered[key] = betweenness[key]
-print("#Nodes!=0:", len(betweenness_filtered))
-# [7.55031845e-65] [2.24284729e+100]
+# nx.set_node_attributes(G, betweenness, "betweenness")
+# nx.write_graphml(G, '../graphs/betweenness/' + str(baseAmount) + _1609498800.graphml')
 
+G = nx.read_graphml('../graphs/betweenness/' + str(baseAmount) + '_1609498800.graphml')
+node_bt_sorted = sorted(G.nodes, key=lambda x: G.nodes[x]['betweenness'], reverse=True)
 
-df = pd.DataFrame.from_dict(betweenness_filtered, orient='index')
-df.to_csv('../analysis/betweenness_results/' + str(baseAmount) + '_1609498800_filtered_nw',
-          index=False)
+node_dict = dict()
+for node in node_bt_sorted:
+    # print('Node: ', node, 'BT: ', G.nodes[node]['betweenness'], 'D: ', G.degree[node])
+    node_dict[node] = dict()
+    node_dict[node]['betweenness'] = G.nodes[node]['betweenness']
+    node_dict[node]['degree'] = G.degree[node]
 
-df = pd.read_csv('../analysis/betweenness_results/1000000000_1609498800_filtered_nw')
-drawHistogram(df)
+    adj_nodes = G.adj[node]
+    deg_one_sum, deg_two_sum = 0, 0
+    for key in adj_nodes:
+        deg = G.degree[key]
+        if deg == 1:
+            deg_one_sum += 1
+        elif deg == 2:
+            deg_two_sum += 1
 
+    node_dict[node]['deg_one_percentage'] = (deg_one_sum / G.degree[node])
+    node_dict[node]['deg_two_percentage'] = (deg_two_sum / G.degree[node])
+
+df = pd.DataFrame.from_dict(node_dict, orient='index')
+df.to_csv('../analysis/results/' + str(baseAmount) + '_1609498800.csv',
+          index=True, index_label='node')
+#
+# df = pd.read_csv('../analysis/betweenness_results/1000000000_1609498800_filtered_nw')
+# drawHistogram(df)
+#
 
 
