@@ -3,8 +3,6 @@ import networkx as nx
 import pandas as pd
 from betweenness import calc_betweenness_centrality
 
-
-
 G = nx.Graph()
 # Weight
 G.add_edge("a", "b", weight=0)
@@ -17,7 +15,7 @@ G.add_edge("d", "f", weight=3)
 G.add_edge("e", "f", weight=0)
 G.add_edge("e", "h", weight=0)
 G.add_edge("g", "h", weight=10)
-#
+
 # G.add_edge("a", "l", weight=1)
 # G.add_edge("l", "k", weight=3)
 # G.add_edge("k", "e", weight=1)
