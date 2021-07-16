@@ -38,6 +38,7 @@ def draw_histogram(df, title, filePath):
     # print('Bins: ', bins)
     axarr = df.hist(bins=10, edgecolor='black', linewidth=1.2)
     for ax in axarr.flatten():
+        ax.set_xlim(left=0.)
         ax.set_ylabel('#Nodes')
         ax.set_xlabel('Clustering coefficient')
 
@@ -140,7 +141,7 @@ timestamps = [
     1609498800
 ]
 
-graphTimestamp = 1522576800
+graphTimestamp = timestamps[8]
 baseAmount = 1000000000
            # 100000000 -> 0,001 BTC
            # 1000000000 -> 0,01 BTC
