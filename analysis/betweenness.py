@@ -49,16 +49,49 @@ def draw_histogram(df, title, filePath):
     # df.boxplot(meanline=True, showfliers=False, showmeans=True)
     # plt.show()
 
-def createGraphFromGraphML(filePath, baseAmount):
+
+def createGraphFromGraphML(filePath, baseAmount, timestamp, plot=False):
     print("Creating graph from file")
     g = nx.read_graphml(filePath)
     G = nx.Graph()
+
+    seen_source = set()
+    bar_dict = dict()
+    bar_dict['both'] = 0
+    bar_dict['fee_base'] = 0
+    bar_dict['fee_prop'] = 0
+
+    weights = list()
+    for edge in g.edges(data=True):
+        fee = edge[2]['fee_base_msat'] + (baseAmount * edge[2]['fee_proportional_millionths'] / 1000000)
+        if fee != 0:
+            weights.append(fee)
+
+    min_weight = min(weights)
     for edge in g.edges(data=True):
         # Weight = Fee
+        if edge[2]['source'] not in seen_source:
+            seen_source.add(edge[2]['source'])
+            if edge[2]['fee_base_msat'] == 0 and edge[2]['fee_proportional_millionths'] == 0:
+                bar_dict['both'] += 1
+            elif edge[2]['fee_base_msat'] == 0:
+                bar_dict['fee_base'] += 1
+            elif edge[2]['fee_proportional_millionths'] == 0:
+                bar_dict['fee_prop'] += 1
+
         weight = edge[2]['fee_base_msat'] + (baseAmount * edge[2]['fee_proportional_millionths'] / 1000000)
+        # print("Base: ", edge[2]['fee_base_msat'], "Prop: ", edge[2]['fee_proportional_millionths'], "Weight: ", weight)
         if weight == 0:
-            weight = 1
+            weight = min_weight / len(G.nodes)
         G.add_edge(edge[2]['source'], edge[2]['destination'], weight=weight)
+
+    if plot:
+        df = pd.DataFrame.from_dict(bar_dict, orient='index')
+        ax = df.plot.bar(rot=0)
+        ax.set_ylabel('#nodes')
+        ax.set_xlabel('fee parameter')
+        plt.show()
+        plt.savefig('../analysis/plots/fees/zero_fees_' + str(timestamp) + '.png')
     return G
 
 
@@ -97,7 +130,7 @@ def calc_node_degrees(G, sorted_nodes_dict):
 
 # Init all necessary calculations
 def initProcess(graphTimestamp, baseAmount, filePath):
-    G = createGraphFromGraphML(filePath, baseAmount)
+    G = createGraphFromGraphML(filePath, baseAmount, graphTimestamp, plot=False)
     betweenness = calc_betweenness_centrality(G)
     clustering = calc_clustering_coefficient(G)
 
@@ -125,8 +158,51 @@ def initProcess(graphTimestamp, baseAmount, filePath):
         to_csv[node]['deg_greater'] = degrees[node]['deg_greater_three']
 
     df = pd.DataFrame.from_dict(to_csv, orient='index')
-    df.to_csv('../analysis/results/' + str(baseAmount) + '_' + str(graphTimestamp) + 'norm.csv',
+    df.to_csv('../analysis/results/' + str(baseAmount) + '_' + str(graphTimestamp) + '.csv',
               index=True, index_label='node')
+
+
+def scale(val, src, dst):
+    """
+    Scale the given value from the scale of src to the scale of dst.
+    """
+    return ((val - src[0]) / (src[1] - src[0])) * (dst[1] - dst[0]) + dst[0]
+
+
+def plot_cdf(df_plot):
+    data = df_plot['betweenness'].values
+    data.sort()
+
+    removed, toHundred, toTenThousand, toMillion, toMax, toLog = list(), list(), list(), list(), list(), list()
+    [removed.append(x) for x in data if x < 1]
+    [toHundred.append(x) for x in data if 1 <= x <= 100]
+    [toTenThousand.append(x) for x in data if 101 <= x <= 10000]
+    [toMillion.append(x) for x in data if 10001 <= x <= 1000000]
+    [toMax.append(x) for x in data if 1000001 <= x]
+    [toLog.append(x) for x in data if 1 <= x]
+
+    ranges = [toHundred, toTenThousand, toMillion, toMax, toLog]
+    titles = ['1 to 100', '101 to 10000', '10001 to 1000000', '1000001 to 7500000', '1 to 7500000']
+
+    for r, title, index in zip(ranges, titles, range(len(ranges))):
+        y = np.zeros(len(r))
+        for i in range(len(r)):
+            y[i] = (i+1)/len(y)
+        plt.ylim(0, 1)
+
+        # If last element in list
+        filePath = '../analysis/plots/betweenness/cdf/cdf_to_' + str(int(max(r))) + '.png'
+        if index == len(ranges)-1:
+            plt.xscale('log')
+            filePath = '../analysis/plots/betweenness/cdf/cdf_to_' + str(int(max(r))) + '_log.png'
+        plt.plot(r, y)
+        plt.xlabel('x')
+        plt.ylabel('y')
+        # plt.title("CDF: " + str(np.ceil(int(min(r)))) + ' to ' + str(np.ceil(int(max(r)))))
+        plt.title("CDF: " + title)
+        plt.savefig(filePath)
+        plt.show()
+
 
 timestamps = [
     1522576800,
@@ -141,7 +217,7 @@ timestamps = [
     1609498800
 ]
 
-graphTimestamp = timestamps[8]
+graphTimestamp = timestamps[9]
 baseAmount = 1000000000
            # 100000000 -> 0,001 BTC
            # 1000000000 -> 0,01 BTC
@@ -150,16 +226,16 @@ baseAmount = 1000000000
 filePath = '../graphs/' + str(graphTimestamp) + '_lngraph.graphml'
 # initProcess(graphTimestamp, baseAmount, filePath)
 
-# df_hist = pd.read_csv('../analysis/results/' + str(baseAmount) + '_' + str(graphTimestamp) + '.csv')
+df_plot= pd.read_csv('../analysis/results/' + str(baseAmount) + '_' + str(graphTimestamp) + '.csv')
+plot_cdf(df_plot)
 
+filePathClustering = '../analysis/plots/clustering/clustering_' + str(graphTimestamp) + '.png'
+filePathBetweenness = '../analysis/plots/betweenness/betweenness' + str(graphTimestamp) + '.png'
 
-filePathClustering = '../analysis/plots/clustering_' + str(graphTimestamp) + '.png'
-filePathBetweenness = '../analysis/plots/betweenness' + str(graphTimestamp) + '.png'
-
-# Only Clsutering coeff
-G = createGraphFromGraphML(filePath, baseAmount)
-coeff_dict = calc_clustering_coefficient(G)
-df_hist = pd.DataFrame.from_dict(coeff_dict, orient='index')
-draw_histogram(df_hist, "Timestamp: " + str(graphTimestamp), filePathClustering)
+# Only Clustering
+# G = createGraphFromGraphML(filePath, baseAmount, graphTimestamp, plot=False)
+# coeff_dict = calc_clustering_coefficient(G)
+# df_hist = pd.DataFrame.from_dict(coeff_dict, orient='index')
+# draw_histogram(df_hist, "Timestamp: " + str(graphTimestamp), filePathClustering)
 
 
