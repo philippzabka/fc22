@@ -8,8 +8,24 @@ Fee = fee_base_msat +(amount * fee_proportional_millionths / 10**6)
 """
 
 
+def calc_closeness_centrality(G):
+    return nx.closeness_centrality(G, distance="weight")
+
+
+def calc_degree_centrality(G):
+    return nx.degree_centrality(G)
+
+
+def calc_edge_betweenness(G):
+    return nx.edge_betweenness_centrality(G, weight="weight", normalized=False)
+
+
+def calc_page_rank(G):
+    return nx.pagerank(G, weight="weight")
+
+
 def calc_betweenness_centrality(G):
-    return nx.betweenness_centrality(G, weight='weight', normalized=False)
+    return nx.betweenness_centrality(G, weight="weight", normalized=False)
 
 
 def calc_triangles(G):
@@ -24,34 +40,7 @@ def calc_avg_clustering_coefficient(G):
     return nx.average_clustering(G)
 
 
-def draw_histogram(df, title, filePath):
-
-    # bt_vals = list()
-    # for value in df.values:
-    #     if value != 0:
-    #         bt_vals.append(value)
-    # df = pd.DataFrame(bt_vals)
-
-    # binWidth = int(np.sqrt(2200))
-    # bins = np.arange(min(df.values), max(df.values) + binWidth, binWidth)
-    # print(bins)
-    # print('Bins: ', bins)
-    axarr = df.hist(bins=10, edgecolor='black', linewidth=1.2)
-    for ax in axarr.flatten():
-        ax.set_xlim(left=0.)
-        ax.set_ylabel('#Nodes')
-        ax.set_xlabel('Clustering coefficient')
-
-    plt.title(title)
-    plt.savefig(filePath)
-    plt.show()
-
-    # df.boxplot(meanline=True, showfliers=False, showmeans=True)
-    # plt.show()
-
-
 def createGraphFromGraphML(filePath, baseAmount, timestamp, plot=False):
-    print("Creating graph from file")
     g = nx.read_graphml(filePath)
     G = nx.Graph()
 
@@ -142,6 +131,9 @@ def initProcess(graphTimestamp, baseAmount, filePath):
     # Sort nodes according to highest betweenness
     sorted_nodes = sorted(G.nodes, key=lambda x: G.nodes[x]['betweenness'], reverse=True)
 
+    # Calc pagerank
+    page_ranks = calc_page_rank(G)
+
     # Calc node degrees
     degrees = calc_node_degrees(G, sorted_nodes)
 
@@ -151,6 +143,7 @@ def initProcess(graphTimestamp, baseAmount, filePath):
         to_csv[node] = dict()
         to_csv[node]['betweenness'] = G.nodes[node]['betweenness']
         to_csv[node]['clustering'] = G.nodes[node]['clustering']
+        to_csv[node]['page_rank'] = page_ranks[node]
         to_csv[node]['degree'] = degrees[node]['degree']
         to_csv[node]['deg_one'] = degrees[node]['deg_one']
         to_csv[node]['deg_two'] = degrees[node]['deg_two']
@@ -160,17 +153,11 @@ def initProcess(graphTimestamp, baseAmount, filePath):
     df = pd.DataFrame.from_dict(to_csv, orient='index')
     df.to_csv('../analysis/results/' + str(baseAmount) + '_' + str(graphTimestamp) + '.csv',
               index=True, index_label='node')
+    return df
 
 
-def scale(val, src, dst):
-    """
-    Scale the given value from the scale of src to the scale of dst.
-    """
-    return ((val - src[0]) / (src[1] - src[0])) * (dst[1] - dst[0]) + dst[0]
-
-
-def plot_cdf(df_plot):
-    data = df_plot['betweenness'].values
+def splitBetweennessIntoRanges(df):
+    data = df['betweenness'].values
     data.sort()
 
     removed, toHundred, toTenThousand, toMillion, toMax, toLog = list(), list(), list(), list(), list(), list()
@@ -184,6 +171,11 @@ def plot_cdf(df_plot):
     ranges = [toHundred, toTenThousand, toMillion, toMax, toLog]
     titles = ['1 to 100', '101 to 10000', '10001 to 1000000', '1000001 to 7500000', '1 to 7500000']
 
+    return ranges, titles
+
+
+def plot_bt_cdf(df_plot, timestamp, base_amount):
+    ranges, titles = splitBetweennessIntoRanges(df_plot)
     for r, title, index in zip(ranges, titles, range(len(ranges))):
         y = np.zeros(len(r))
         for i in range(len(r)):
@@ -191,17 +183,45 @@ def plot_cdf(df_plot):
         plt.ylim(0, 1)
 
         # If last element in list
-        filePath = '../analysis/plots/betweenness/cdf/cdf_to_' + str(int(max(r))) + '.png'
+        filePath = '../analysis/plots/betweenness/cdf/cdf_' + str(timestamp) + '_' + str(index) + '.png'
         if index == len(ranges)-1:
             plt.xscale('log')
-            filePath = '../analysis/plots/betweenness/cdf/cdf_to_' + str(int(max(r))) + '_log.png'
         plt.plot(r, y)
-        plt.xlabel('x')
-        plt.ylabel('y')
+        plt.xlabel('Node Betweenness')
+        plt.ylabel('Percentage')
         # plt.title("CDF: " + str(np.ceil(int(min(r)))) + ' to ' + str(np.ceil(int(max(r)))))
-        plt.title("CDF: " + title)
-        plt.savefig(filePath)
+        plt.title("Timestamp: " + str(timestamp) + ", Range: " + title + ", Base: " + str(base_amount),  fontsize=10)
+        plt.savefig(filePath, bbox_inches='tight', dpi=400)
         plt.show()
+
+
+def plot_bt_histogram(df_plot, timestamp, base_amount, bins=10):
+    ranges, titles = splitBetweennessIntoRanges(df_plot)
+    for r, title, index in zip(ranges, titles, range(len(ranges))):
+        df_plot = pd.DataFrame(r)
+        ax_arr = df_plot.hist(bins=bins, edgecolor='black', linewidth=1.2, grid=False)
+        for ax in ax_arr.flatten():
+            ax.set_xlim(left=0.)
+            ax.set_ylabel('#Nodes')
+            ax.set_xlabel('Node betweennees')
+        filePath = '../analysis/plots/histogram/betweenness_' + str(timestamp) + '_' + str(index) + '.png'
+        plt.title("Timestamp: " + str(timestamp) + ", Range: " + title + ", Base: " + str(base_amount),  fontsize=10)
+        plt.savefig(filePath, bbox_inches='tight', dpi=400)
+        plt.show()
+
+
+def plot_cluster_histgram(df_plot, timestamp, bins=10):
+    df_plot = pd.DataFrame(df_plot['clustering'])
+    ax_arr = df_plot.hist(bins=bins, edgecolor='black', linewidth=1.2, grid=False)
+    for ax in ax_arr.flatten():
+        ax.set_xlim(left=0.)
+        ax.set_ylabel('#Nodes')
+        ax.set_xlabel('Clustering Coefficient')
+    filePath = '../analysis/plots/histogram/clustering_' + str(timestamp) + '.png'
+    plt.title("Timestamp: " + str(timestamp))
+    plt.savefig(filePath, bbox_inches='tight', dpi=400)
+    plt.show()
+
 
 
 timestamps = [
@@ -217,25 +237,29 @@ timestamps = [
     1609498800
 ]
 
-graphTimestamp = timestamps[9]
+graphTimestamp = timestamps[8]
 baseAmount = 1000000000
            # 100000000 -> 0,001 BTC
            # 1000000000 -> 0,01 BTC
            # 10000000000 -> 0,1 BTC
            # 100000000000 -> 1 BTC
+
 filePath = '../graphs/' + str(graphTimestamp) + '_lngraph.graphml'
-# initProcess(graphTimestamp, baseAmount, filePath)
+# df_plot = initProcess(graphTimestamp, baseAmount, filePath)
 
-df_plot= pd.read_csv('../analysis/results/' + str(baseAmount) + '_' + str(graphTimestamp) + '.csv')
-plot_cdf(df_plot)
+# df_plot = pd.read_csv('../analysis/results/' + str(baseAmount) + '_' + str(graphTimestamp) + '.csv')
+# plot_bt_cdf(df_plot, graphTimestamp, baseAmount)
+# plot_bt_histogram(df_plot, graphTimestamp, baseAmount, 20)
+# plot_cluster_histgram(df_plot, graphTimestamp, 20)
 
-filePathClustering = '../analysis/plots/clustering/clustering_' + str(graphTimestamp) + '.png'
-filePathBetweenness = '../analysis/plots/betweenness/betweenness' + str(graphTimestamp) + '.png'
+# Test
+G = createGraphFromGraphML(filePath, baseAmount, graphTimestamp, plot=False)
+# print("Closeness: ", calc_closeness_centrality(G))
+# print("Degree: ", calc_degree_centrality(G))
+# print("Edge BT: ", calc_edge_betweenness(G))
 
-# Only Clustering
-# G = createGraphFromGraphML(filePath, baseAmount, graphTimestamp, plot=False)
 # coeff_dict = calc_clustering_coefficient(G)
 # df_hist = pd.DataFrame.from_dict(coeff_dict, orient='index')
-# draw_histogram(df_hist, "Timestamp: " + str(graphTimestamp), filePathClustering)
+# plot_cluster_histgram(df_plot, graphTimestamp, 20)
 
 
