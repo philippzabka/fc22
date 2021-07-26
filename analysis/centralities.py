@@ -49,7 +49,7 @@ def calc_avg_clustering_coefficient(G):
     return nx.average_clustering(G)
 
 
-def createGraphFromGraphML(filePath, baseAmount, timestamp, plot=False):
+def createGraphFromGraphML(filePath, baseAmount):
     g = nx.read_graphml(filePath)
     G = nx.DiGraph()
 
@@ -78,33 +78,29 @@ def createGraphFromGraphML(filePath, baseAmount, timestamp, plot=False):
                 bar_dict['fee_prop'] += 1
 
         weight = edge[2]['fee_base_msat'] + (baseAmount * edge[2]['fee_proportional_millionths'] / 1000000)
-        # print("Base: ", edge[2]['fee_base_msat'], "Prop: ", edge[2]['fee_proportional_millionths'], "Weight: ", weight)
         if weight == 0:
             weight = min_weight / len(G.nodes)
         G.add_edge(edge[2]['source'], edge[2]['destination'], weight=weight)
 
-    if plot:
-        df = pd.DataFrame.from_dict(bar_dict, orient='index')
-        ax = df.plot.bar(rot=0)
-        ax.set_ylabel('#nodes')
-        ax.set_xlabel('fee parameter')
-        plt.show()
-        plt.savefig('../analysis/plots/fees/zero_fees_' + str(timestamp) + '.png')
     return G
 
 
-def calc_node_degrees(G, sorted_nodes_dict):
-    # TODO rework function
+def calc_degrees(G, in_deg=False, out_deg=False):
     degrees = dict()
-    for node in sorted_nodes_dict:
+    for node in G.nodes:
         degrees[node] = dict()
-        degrees[node]['degree'] = G.degree[node]
-        # node_degree[node]['betweenness'] = G.nodes[node]['betweenness']
 
         adj_nodes = G.adj[node]
-        deg_one_sum, deg_two_sum, deg_three_sum, deg_greater_three = 0, 0, 0, 0
+        deg_one_sum, deg_two_sum, deg_three_sum, deg_greater = 0, 0, 0, 0
         for key in adj_nodes:
-            deg = G.degree[key]
+
+            if in_deg:
+                deg = G.in_degree[key]
+            elif out_deg:
+                deg = G.out_degree[key]
+            else:
+                deg = G.degree[key]
+
             if deg == 1:
                 deg_one_sum += 1
             elif deg == 2:
@@ -112,24 +108,51 @@ def calc_node_degrees(G, sorted_nodes_dict):
             elif deg == 3:
                 deg_three_sum += 1
             else:
-                deg_greater_three += 1
+                deg_greater += 1
+
+        if in_deg:
+            degrees[node]['deg'] = G.in_degree[node]
+        elif out_deg:
+            degrees[node]['deg'] = G.out_degree[node]
+        else:
+            degrees[node]['deg'] = G.degree[node]
 
         degrees[node]['deg_one'] = (deg_one_sum / G.degree[node])
         degrees[node]['deg_two'] = (deg_two_sum / G.degree[node])
         degrees[node]['deg_three'] = (deg_three_sum / G.degree[node])
-        degrees[node]['deg_greater_three'] = (deg_greater_three / G.degree[node])
 
     return degrees
 
 
 # Init all necessary calculations
 def initProcess(timestamp, baseAmount, filePath, betweenness=False, clustering=False, page=False, deg_cen=False,
-                in_deg_cen=False, out_deg_cen=False, closeness=False, edge_betweenness=False):
-
-    G = createGraphFromGraphML(filePath, baseAmount, graphTimestamp, plot=False)
+                in_deg_cen=False, out_deg_cen=False, closeness=False, edge_betweenness=False, deg=False, in_deg=False,
+                out_deg=False):
+    G = createGraphFromGraphML(filePath, baseAmount)
 
     Path(str(graphTimestamp) + "/" + str(baseAmount)).mkdir(parents=True, exist_ok=True)
     cwd = str(Path().resolve())
+
+    if deg:
+        degrees = calc_degrees(G)
+        degrees_sorted = dict(sorted(degrees.items(), key=lambda item: item[1]['deg'], reverse=True))
+        df = pd.DataFrame.from_dict(degrees_sorted, orient='index')
+        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/degrees.csv',
+                  index=True, index_label='node_id')
+
+    if in_deg:
+        in_degrees = calc_degrees(G, in_deg=in_deg)
+        in_degrees_sorted = dict(sorted(in_degrees.items(), key=lambda item: item[1]['deg'], reverse=True))
+        df = pd.DataFrame.from_dict(in_degrees_sorted, orient='index')
+        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/in_degrees.csv',
+                  index=True, index_label='node_id')
+
+    if out_deg:
+        out_degrees = calc_degrees(G, out_deg=out_deg)
+        out_degrees_sorted = dict(sorted(out_degrees.items(), key=lambda item: item[1]['deg'], reverse=True))
+        df = pd.DataFrame.from_dict(out_degrees_sorted, orient='index')
+        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/out_degrees.csv',
+                  index=True, index_label='node_id')
 
     # Calc betweenness centrality
     if betweenness:
@@ -137,7 +160,7 @@ def initProcess(timestamp, baseAmount, filePath, betweenness=False, clustering=F
         betweenness_sorted = dict(sorted(betweenness.items(), key=lambda item: item[1], reverse=True))
         df = pd.DataFrame.from_dict(betweenness_sorted, orient='index')
         df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/betweenness_centrality.csv',
-                              index=True, index_label=['node_id', 'betweenness'])
+                  index=True, index_label=['node_id', 'betweenness'])
 
     # Calc clustering
     if clustering:
@@ -190,14 +213,10 @@ def initProcess(timestamp, baseAmount, filePath, betweenness=False, clustering=F
     # Calc edge betweenness centrality
     if edge_betweenness:
         edge_betweenness = calc_edge_betweenness(G)
-        print(edge_betweenness)
         edge_betweenness_sorted = dict(sorted(edge_betweenness.items(), key=lambda item: item[1], reverse=True))
         df = pd.DataFrame.from_dict(edge_betweenness_sorted, orient='index')
         df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/edge_betweenness_centrality.csv',
                   index=True, index_label=['edge', 'edge_betweenness'])
-
-    # # Calc node degrees
-    # # degrees = calc_node_degrees(G)
 
 
 def splitBetweennessIntoRanges(df):
@@ -289,8 +308,9 @@ baseAmount = 1000000000
 # 100000000000 -> 1 BTC
 
 filePath = '../graphs/' + str(graphTimestamp) + '_lngraph.graphml'
-initProcess(graphTimestamp, baseAmount, filePath, betweenness=False, clustering=False, page=True, deg_cen=True,
-            in_deg_cen=True, out_deg_cen=True, closeness=True, edge_betweenness=False)
+initProcess(graphTimestamp, baseAmount, filePath, betweenness=True, clustering=True, page=True, deg_cen=True,
+            in_deg_cen=True, out_deg_cen=True, closeness=True, edge_betweenness=True, deg=True, in_deg=True,
+            out_deg=True)
 
 # df_plot = pd.read_csv('../analysis/results/' + str(baseAmount) + '_' + str(graphTimestamp) + '.csv')
 # plot_bt_cdf(df_plot, graphTimestamp, baseAmount)
@@ -298,7 +318,7 @@ initProcess(graphTimestamp, baseAmount, filePath, betweenness=False, clustering=
 # plot_cluster_histgram(df_plot, graphTimestamp, 20)
 
 # Test
-G = createGraphFromGraphML(filePath, baseAmount, graphTimestamp, plot=False)
+# G = createGraphFromGraphML(filePath, baseAmount)
 # TODO maybe try to somehow plot the graph components
 # TODO Update paths & plotting functions
 # print("Closeness: ", calc_closeness_centrality(G))
