@@ -133,94 +133,137 @@ def initProcess(timestamp, baseAmount, filePath, betweenness=False, clustering=F
     Path(str(graphTimestamp) + "/" + str(baseAmount)).mkdir(parents=True, exist_ok=True)
     cwd = str(Path().resolve())
 
-    if deg:
-        degrees = calc_degrees(G)
-        degrees_sorted = dict(sorted(degrees.items(), key=lambda item: item[1]['deg'], reverse=True))
-        df = pd.DataFrame.from_dict(degrees_sorted, orient='index')
-        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/degrees.csv',
-                  index=True, index_label='node_id')
+    try:
+        if deg:
+            degrees = calc_degrees(G)
+            degrees_sorted = dict(sorted(degrees.items(), key=lambda item: item[1]['deg'], reverse=True))
+            df = pd.DataFrame.from_dict(degrees_sorted, orient='index')
+            df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/degrees.csv',
+                      index=True, index_label='node_id')
+    except Exception as e:
+        print(e)
+        pass
 
-    if in_deg:
-        in_degrees = calc_degrees(G, in_deg=in_deg)
-        in_degrees_sorted = dict(sorted(in_degrees.items(), key=lambda item: item[1]['deg'], reverse=True))
-        df = pd.DataFrame.from_dict(in_degrees_sorted, orient='index')
-        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/in_degrees.csv',
-                  index=True, index_label='node_id')
+    try:
+        if in_deg:
+            in_degrees = calc_degrees(G, in_deg=in_deg)
+            in_degrees_sorted = dict(sorted(in_degrees.items(), key=lambda item: item[1]['deg'], reverse=True))
+            df = pd.DataFrame.from_dict(in_degrees_sorted, orient='index')
+            df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/in_degrees.csv',
+                      index=True, index_label='node_id')
+    except Exception as e:
+        print(e)
+        pass
 
-    if out_deg:
-        out_degrees = calc_degrees(G, out_deg=out_deg)
-        out_degrees_sorted = dict(sorted(out_degrees.items(), key=lambda item: item[1]['deg'], reverse=True))
-        df = pd.DataFrame.from_dict(out_degrees_sorted, orient='index')
-        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/out_degrees.csv',
-                  index=True, index_label='node_id')
+    try:
+        if out_deg:
+            out_degrees = calc_degrees(G, out_deg=out_deg)
+            out_degrees_sorted = dict(sorted(out_degrees.items(), key=lambda item: item[1]['deg'], reverse=True))
+            df = pd.DataFrame.from_dict(out_degrees_sorted, orient='index')
+            df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/out_degrees.csv',
+                      index=True, index_label='node_id')
+    except Exception as e:
+        print(e)
+        pass
 
     # Calc betweenness centrality
-    if betweenness:
-        betweenness = calc_betweenness_centrality(G)
-        betweenness_sorted = dict(sorted(betweenness.items(), key=lambda item: item[1], reverse=True))
-        df = pd.DataFrame.from_dict(betweenness_sorted, orient='index')
-        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/betweenness_centrality.csv',
-                  index=True, index_label=['node_id', 'betweenness'])
+    try:
+        if betweenness:
+            betweenness = calc_betweenness_centrality(G)
+            betweenness_sorted = dict(sorted(betweenness.items(), key=lambda item: item[1], reverse=True))
+            df = pd.DataFrame.from_dict(betweenness_sorted, orient='index')
+            df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/betweenness_centrality.csv',
+                      index=True, index_label=['node_id', 'betweenness'])
+    except Exception as e:
+        print(e)
+        pass
 
     # Calc clustering
-    if clustering:
-        clustering_coeff = calc_clustering_coefficient(G)
-        clustering_coeff_sorted = dict(sorted(clustering_coeff.items(), key=lambda item: item[1], reverse=True))
-        df = pd.DataFrame.from_dict(clustering_coeff_sorted, orient='index')
-        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/clustering.csv',
-                  index=True, index_label=['node_id', 'clustering_coeff'])
+    try:
+        if clustering:
+            clustering_coeff = calc_clustering_coefficient(G)
+            clustering_coeff_sorted = dict(sorted(clustering_coeff.items(), key=lambda item: item[1], reverse=True))
+            df = pd.DataFrame.from_dict(clustering_coeff_sorted, orient='index')
+            df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/clustering.csv',
+                      index=True, index_label=['node_id', 'clustering_coeff'])
+    except Exception as e:
+        print(e)
+        pass
 
     # Calc pagerank
-    if page:
-        page_rank = calc_page_rank(G)
-        page_sorted = dict(sorted(page_rank.items(), key=lambda item: item[1], reverse=True))
-        df = pd.DataFrame.from_dict(page_sorted, orient='index')
-        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/pagerank.csv',
-                  index=True, index_label=['node_id', 'pagerank'])
+    try:
+        if page:
+            page_rank = calc_page_rank(G)
+            page_sorted = dict(sorted(page_rank.items(), key=lambda item: item[1], reverse=True))
+            df = pd.DataFrame.from_dict(page_sorted, orient='index')
+            df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/pagerank.csv',
+                      index=True, index_label=['node_id', 'pagerank'])
+    except Exception as e:
+        print(e)
+        pass
 
     # Calc node degree centrality
-    if deg_cen:
-        degree_centrality = calc_degree_centrality(G)
-        degree_centrality_sorted = dict(sorted(degree_centrality.items(), key=lambda item: item[1], reverse=True))
-        df = pd.DataFrame.from_dict(degree_centrality_sorted, orient='index')
-        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/degree_centrality.csv',
-                  index=True, index_label=['node_id', 'degree_centrality'])
+    try:
+        if deg_cen:
+            degree_centrality = calc_degree_centrality(G)
+            degree_centrality_sorted = dict(sorted(degree_centrality.items(), key=lambda item: item[1], reverse=True))
+            df = pd.DataFrame.from_dict(degree_centrality_sorted, orient='index')
+            df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/degree_centrality.csv',
+                      index=True, index_label=['node_id', 'degree_centrality'])
+    except Exception as e:
+        print(e)
+        pass
 
     # Calc node in-degree centrality
-    if in_deg_cen:
-        degree_in_centrality = calc_in_degree_centrality(G)
-        degree_in_sorted = dict(sorted(degree_in_centrality.items(), key=lambda item: item[1], reverse=True))
-        df = pd.DataFrame.from_dict(degree_in_sorted, orient='index')
-        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/in_degree_centrality.csv',
-                  index=True, index_label=['node_id', 'in_degree_centrality'])
+    try:
+        if in_deg_cen:
+            degree_in_centrality = calc_in_degree_centrality(G)
+            degree_in_sorted = dict(sorted(degree_in_centrality.items(), key=lambda item: item[1], reverse=True))
+            df = pd.DataFrame.from_dict(degree_in_sorted, orient='index')
+            df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/in_degree_centrality.csv',
+                      index=True, index_label=['node_id', 'in_degree_centrality'])
+    except Exception as e:
+        print(e)
+        pass
 
     # Calc node out-degree centrality
-    if out_deg_cen:
-        degree_out_centrality = calc_out_degree_centrality(G)
-        degree_out_sorted = dict(sorted(degree_out_centrality.items(), key=lambda item: item[1], reverse=True))
-        df = pd.DataFrame.from_dict(degree_out_sorted, orient='index')
-        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/out_degree_centrality.csv',
-                  index=True, index_label=['node_id', 'out_degree_centrality'])
+    try:
+        if out_deg_cen:
+            degree_out_centrality = calc_out_degree_centrality(G)
+            degree_out_sorted = dict(sorted(degree_out_centrality.items(), key=lambda item: item[1], reverse=True))
+            df = pd.DataFrame.from_dict(degree_out_sorted, orient='index')
+            df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/out_degree_centrality.csv',
+                      index=True, index_label=['node_id', 'out_degree_centrality'])
+    except Exception as e:
+        print(e)
+        pass
 
     # Calc closeness centrality
-    if closeness:
-        closeness = calc_closeness_centrality(G)
-        closeness_sorted = dict(sorted(closeness.items(), key=lambda item: item[1], reverse=True))
-        df = pd.DataFrame.from_dict(closeness_sorted, orient='index')
-        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/closeness_centrality.csv',
-                  index=True, index_label=['node_id', 'closeness_centrality'])
+    try:
+        if closeness:
+            closeness = calc_closeness_centrality(G)
+            closeness_sorted = dict(sorted(closeness.items(), key=lambda item: item[1], reverse=True))
+            df = pd.DataFrame.from_dict(closeness_sorted, orient='index')
+            df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/closeness_centrality.csv',
+                      index=True, index_label=['node_id', 'closeness_centrality'])
+    except Exception as e:
+        print(e)
+        pass
 
     # Calc edge betweenness centrality
-    if edge_betweenness:
-        edge_betweenness = calc_edge_betweenness(G)
-        edge_betweenness_sorted = dict(sorted(edge_betweenness.items(), key=lambda item: item[1], reverse=True))
-        df = pd.DataFrame.from_dict(edge_betweenness_sorted, orient='index')
-        df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/edge_betweenness_centrality.csv',
-                  index=True, index_label=['edge', 'edge_betweenness'])
+    try:
+        if edge_betweenness:
+            edge_betweenness = calc_edge_betweenness(G)
+            edge_betweenness_sorted = dict(sorted(edge_betweenness.items(), key=lambda item: item[1], reverse=True))
+            df = pd.DataFrame.from_dict(edge_betweenness_sorted, orient='index')
+            df.to_csv(cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/edge_betweenness_centrality.csv',
+                      index=True, index_label=['edge', 'edge_betweenness'])
+    except Exception as e:
+        print(e)
+        pass
 
 
 def splitBetweennessIntoRanges(df):
-    # TODO update values
     data = df['betweenness'].values
     data.sort()
 
@@ -233,21 +276,26 @@ def splitBetweennessIntoRanges(df):
     [toLog.append(x) for x in data if 1 <= x]
 
     ranges = [toHundred, toTenThousand, toMillion, toMax, toLog]
-    titles = ['1 to 100', '101 to 10000', '10001 to 1000000', '1000001 to 7500000', '1 to 7500000']
+    titles = ['1 to 100', '101 to 10000', '10001 to 1000000', '1000001 to 8500000', '1 to 8500000']
 
     return ranges, titles
 
 
-def plot_bt_cdf(df_plot, timestamp, base_amount):
-    ranges, titles = splitBetweennessIntoRanges(df_plot)
+def plot_bt_cdf(df, timestamp, base_amount):
+    ranges, titles = splitBetweennessIntoRanges(df)
+
+    Path(str(timestamp) + "/" + str(baseAmount) + "/plots/cbf").mkdir(parents=True, exist_ok=True)
+    cwd = str(Path().resolve())
+
     for r, title, index in zip(ranges, titles, range(len(ranges))):
         y = np.zeros(len(r))
         for i in range(len(r)):
             y[i] = (i + 1) / len(y)
         plt.ylim(0, 1)
 
-        # If last element in list
-        filePath = '../analysis/plots/betweenness/cdf/cdf_' + str(timestamp) + '_' + str(index) + '.png'
+        filePath = cwd + "/" + str(timestamp) + '/' + str(baseAmount) + \
+                   'plots/cbf/cdf_' + str(index) + '.png'
+        # If last element in list make log scale x-axis
         if index == len(ranges) - 1:
             plt.xscale('log')
         plt.plot(r, y)
@@ -274,7 +322,7 @@ def plot_bt_histogram(df_plot, timestamp, base_amount, bins=10):
         plt.show()
 
 
-def plot_cluster_histgram(df_plot, timestamp, bins=10):
+def plot_cluster_histogram(df_plot, timestamp, bins=10):
     df_plot = pd.DataFrame(df_plot['clustering'])
     ax_arr = df_plot.hist(bins=bins, edgecolor='black', linewidth=1.2, grid=False)
     for ax in ax_arr.flatten():
@@ -300,20 +348,22 @@ timestamps = [
     1609498800
 ]
 
-graphTimestamp = timestamps[8]
-baseAmount = 1000000000
-# 100000000 -> 0,001 BTC
-# 1000000000 -> 0,01 BTC
-# 10000000000 -> 0,1 BTC
-# 100000000000 -> 1 BTC
+timestamp = timestamps[8]
+baseAmount = 10000000000
+# 10000000 -> 0,0001 BTC -> 3€
+# 100000000 -> 0,001 BTC -> 32€
+# 1000000000 -> 0,01 BTC -> 320€
+# 10000000000 -> 0,1 BTC -> 3200€
+# 100000000000 ->  1 BTC ->  32000€
 
-filePath = '../graphs/' + str(graphTimestamp) + '_lngraph.graphml'
-initProcess(graphTimestamp, baseAmount, filePath, betweenness=True, clustering=True, page=True, deg_cen=True,
+filePath = '../graphs/' + str(timestamp) + '_lngraph.graphml'
+initProcess(timestamp, baseAmount, filePath, betweenness=True, clustering=True, page=True, deg_cen=True,
             in_deg_cen=True, out_deg_cen=True, closeness=True, edge_betweenness=True, deg=True, in_deg=True,
             out_deg=True)
 
-# df_plot = pd.read_csv('../analysis/results/' + str(baseAmount) + '_' + str(graphTimestamp) + '.csv')
-# plot_bt_cdf(df_plot, graphTimestamp, baseAmount)
+cwd = str(Path().resolve())
+df_plot = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount) + '.csv')
+plot_bt_cdf(df_plot, timestamp, baseAmount)
 # plot_bt_histogram(df_plot, graphTimestamp, baseAmount, 20)
 # plot_cluster_histgram(df_plot, graphTimestamp, 20)
 
