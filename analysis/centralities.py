@@ -3,11 +3,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
+import os
+
+# TODO Alle timestamps + cdf & histogramme von betweenness
+# TODO Kleiner Report der Methodik für P1
 
 """
 Fee = fee_base_msat +(amount * fee_proportional_millionths / 10**6)
 """
-
 
 def calc_closeness_centrality(G):
     return nx.closeness_centrality(G, distance="weight")
@@ -130,7 +133,7 @@ def initProcess(timestamp, baseAmount, filePath, betweenness=False, clustering=F
                 out_deg=False):
     G = createGraphFromGraphML(filePath, baseAmount)
 
-    Path(str(graphTimestamp) + "/" + str(baseAmount)).mkdir(parents=True, exist_ok=True)
+    Path(str(timestamp) + "/" + str(baseAmount)).mkdir(parents=True, exist_ok=True)
     cwd = str(Path().resolve())
 
     try:
@@ -281,43 +284,74 @@ def splitBetweennessIntoRanges(df):
     return ranges, titles
 
 
-def plot_bt_cdf(df, timestamp, base_amount):
+def plot_bt_cdf(df, df2, df3, timestamp, baseAmount):
     ranges, titles = splitBetweennessIntoRanges(df)
+    ranges2, titles = splitBetweennessIntoRanges(df2)
+    ranges3, titles = splitBetweennessIntoRanges(df3)
 
-    Path(str(timestamp) + "/" + str(baseAmount) + "/plots/cbf").mkdir(parents=True, exist_ok=True)
+    # Path(str(timestamp) + "/" + str(baseAmount) + "/plots/cdf").mkdir(parents=True, exist_ok=True)
+    Path(str(timestamp) + "/plots/cdf").mkdir(parents=True, exist_ok=True)
     cwd = str(Path().resolve())
 
-    for r, title, index in zip(ranges, titles, range(len(ranges))):
-        y = np.zeros(len(r))
+    for r, r2, r3, title, index in zip(ranges, ranges2, ranges3, titles, range(len(ranges))):
+        y, y2, y3 = np.zeros(len(r)), np.zeros(len(r2)), np.zeros(len(r3))
         for i in range(len(r)):
             y[i] = (i + 1) / len(y)
+        for i in range(len(r2)):
+            y2[i] = (i + 1) / len(y2)
+        for i in range(len(r3)):
+            y3[i] = (i + 1) / len(y3)
         plt.ylim(0, 1)
 
-        filePath = cwd + "/" + str(timestamp) + '/' + str(baseAmount) + \
-                   'plots/cbf/cdf_' + str(index) + '.png'
+        # filePath = cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/plots/cdf/cdf_' + str(index) + 'grp.png'
+        filePath = cwd + "/" + str(timestamp) + '/plots/cdf/cdf_' + str(index) + '_grp.png'
         # If last element in list make log scale x-axis
         if index == len(ranges) - 1:
             plt.xscale('log')
-        plt.plot(r, y)
+        plt.plot(r, y, label="0,0001 BTC")
+        plt.plot(r2, y2, label="0,01 BTC")
+        plt.plot(r3, y3, label="0,1 BTC")
+        plt.legend(loc=4)
         plt.xlabel('Node Betweenness')
         plt.ylabel('Percentage')
-        # plt.title("CDF: " + str(np.ceil(int(min(r)))) + ' to ' + str(np.ceil(int(max(r)))))
-        plt.title("Timestamp: " + str(timestamp) + ", Range: " + title + ", Base: " + str(base_amount), fontsize=10)
+        # plt.title("Timestamp: " + str(timestamp) + ", Range: " + title + ", Base: " + str(base_amount), fontsize=10)
+        plt.title("Timestamp: " + str(timestamp), fontsize=12)
         plt.savefig(filePath, bbox_inches='tight', dpi=400)
         plt.show()
 
 
-def plot_bt_histogram(df_plot, timestamp, base_amount, bins=10):
-    ranges, titles = splitBetweennessIntoRanges(df_plot)
-    for r, title, index in zip(ranges, titles, range(len(ranges))):
-        df_plot = pd.DataFrame(r)
-        ax_arr = df_plot.hist(bins=bins, edgecolor='black', linewidth=1.2, grid=False)
-        for ax in ax_arr.flatten():
-            ax.set_xlim(left=0.)
-            ax.set_ylabel('#Nodes')
-            ax.set_xlabel('Node betweennees')
-        filePath = '../analysis/plots/histogram/betweenness_' + str(timestamp) + '_' + str(index) + '.png'
-        plt.title("Timestamp: " + str(timestamp) + ", Range: " + title + ", Base: " + str(base_amount), fontsize=10)
+def plot_bt_histogram(df, df2, df3,  timestamp, baseAmount, bins=10):
+    ranges, titles = splitBetweennessIntoRanges(df)
+    ranges2, titles = splitBetweennessIntoRanges(df2)
+    ranges3, titles = splitBetweennessIntoRanges(df3)
+
+    # Path(str(timestamp) + "/" + str(baseAmount) + "/plots/histogram").mkdir(parents=True, exist_ok=True)
+    Path(str(timestamp) + "/plots/histogram").mkdir(parents=True, exist_ok=True)
+
+    cwd = str(Path().resolve())
+    for r, r2, r3, title, index in zip(ranges, ranges2, ranges3, titles, range(len(ranges))):
+        range_list = [r, r2, r3]
+        longest_list = max(range_list, key=len)
+
+        for i in range(len(longest_list)):
+            if len(longest_list) > len(r):
+                r.append(None)
+            if len(longest_list) > len(r2):
+                r2.append(None)
+            if len(longest_list) > len(r3):
+                r3.append(None)
+
+        df = pd.DataFrame({
+            "0,0001 BTC": r,
+            "0,01 BTC": r2,
+            "0,1 BTC": r3
+        }, columns=["0,0001 BTC", "0,01 BTC", "0,1 BTC"],)
+        plt.figure()
+        ax = df.plot.hist(bins=bins, edgecolor='black', linewidth=1.2, grid=False, stacked=True, alpha=1)
+        ax.set_ylabel('#Nodes')
+        ax.set_xlabel('Node betweennees')
+        filePath = cwd + "/" + str(timestamp) + '/plots/histogram/hist_' + str(index) + '_grp.png'
+        plt.title("Timestamp: " + str(timestamp), fontsize=12)
         plt.savefig(filePath, bbox_inches='tight', dpi=400)
         plt.show()
 
@@ -348,23 +382,31 @@ timestamps = [
     1609498800
 ]
 
-timestamp = timestamps[8]
-baseAmount = 10000000000
-# 10000000 -> 0,0001 BTC -> 3€
+timestamp = timestamps[2]
+baseAmount = 10000000
+# 10000000 -> 0,0001 BTC -> 3€ *
 # 100000000 -> 0,001 BTC -> 32€
-# 1000000000 -> 0,01 BTC -> 320€
-# 10000000000 -> 0,1 BTC -> 3200€
+# 1000000000 -> 0,01 BTC -> 320€ *
+# 10000000000 -> 0,1 BTC -> 3200€ *
 # 100000000000 ->  1 BTC ->  32000€
 
-filePath = '../graphs/' + str(timestamp) + '_lngraph.graphml'
-initProcess(timestamp, baseAmount, filePath, betweenness=True, clustering=True, page=True, deg_cen=True,
-            in_deg_cen=True, out_deg_cen=True, closeness=True, edge_betweenness=True, deg=True, in_deg=True,
-            out_deg=True)
+# filePath = '../graphs/' + str(timestamp) + '_lngraph.graphml'
+# initProcess(timestamp, baseAmount, filePath, betweenness=True, clustering=True, page=True, deg_cen=True,
+#             in_deg_cen=True, out_deg_cen=True, closeness=True, edge_betweenness=True, deg=True, in_deg=True,
+#             out_deg=True)
 
 cwd = str(Path().resolve())
-df_plot = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount) + '.csv')
-plot_bt_cdf(df_plot, timestamp, baseAmount)
-# plot_bt_histogram(df_plot, graphTimestamp, baseAmount, 20)
+filepath = cwd + '/' + str(timestamp) + '/' + str(baseAmount)
+filenames = next(os.walk(filepath), (None, None, []))[2]  # [] if no file
+print(filenames)
+baseAmount, baseAmount2, baseAmount3 = 10000000, 1000000000, 10000000000
+df_plot = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount) + '/' + filenames[1])
+df_plot_2 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount2) + '/' + filenames[1])
+df_plot_3 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount3) + '/' + filenames[1])
+
+
+plot_bt_cdf(df_plot, df_plot_2, df_plot_3, timestamp, baseAmount)
+plot_bt_histogram(df_plot, df_plot_2, df_plot_3, timestamp, baseAmount, 20)
 # plot_cluster_histgram(df_plot, graphTimestamp, 20)
 
 # Test
@@ -380,3 +422,7 @@ plot_bt_cdf(df_plot, timestamp, baseAmount)
 # coeff_dict = calc_clustering_coefficient(G)
 # df_hist = pd.DataFrame.from_dict(coeff_dict, orient='index')
 # plot_cluster_histgram(df_plot, graphTimestamp, 20)
+
+# TODO Differenz anschauen von Node Betweenness in verschiedenen Timestamps
+# TODO Min/Max von Bt über alle Timestamps und Differenz plotten --> Wichtig
+# TODO Report + offene Fragen --> Wichtig
