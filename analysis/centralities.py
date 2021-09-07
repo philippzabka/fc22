@@ -295,6 +295,8 @@ def plot_bt_cdf(df, df2, df3, timestamp, baseAmount):
 
     for r, r2, r3, title, index in zip(ranges, ranges2, ranges3, titles, range(len(ranges))):
         y, y2, y3 = np.zeros(len(r)), np.zeros(len(r2)), np.zeros(len(r3))
+
+        print(index)
         for i in range(len(r)):
             y[i] = (i + 1) / len(y)
         for i in range(len(r2)):
@@ -382,7 +384,7 @@ timestamps = [
     1609498800
 ]
 
-timestamp = timestamps[2]
+timestamp = timestamps[5]
 baseAmount = 10000000
 # 10000000 -> 0,0001 BTC -> 3€ *
 # 100000000 -> 0,001 BTC -> 32€
@@ -395,14 +397,15 @@ baseAmount = 10000000
 #             in_deg_cen=True, out_deg_cen=True, closeness=True, edge_betweenness=True, deg=True, in_deg=True,
 #             out_deg=True)
 
+print(timestamp)
 cwd = str(Path().resolve())
 filepath = cwd + '/' + str(timestamp) + '/' + str(baseAmount)
 filenames = next(os.walk(filepath), (None, None, []))[2]  # [] if no file
 print(filenames)
 baseAmount, baseAmount2, baseAmount3 = 10000000, 1000000000, 10000000000
-df_plot = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount) + '/' + filenames[1])
-df_plot_2 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount2) + '/' + filenames[1])
-df_plot_3 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount3) + '/' + filenames[1])
+df_plot = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount) + '/' + filenames[3])
+df_plot_2 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount2) + '/' + filenames[3])
+df_plot_3 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount3) + '/' + filenames[3])
 
 
 plot_bt_cdf(df_plot, df_plot_2, df_plot_3, timestamp, baseAmount)
