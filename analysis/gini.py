@@ -37,21 +37,23 @@ def plot_gini_curve(decentiles, betweennes_percentiles):
     plt.xlabel('% of Nodes')
     plt.ylabel('% of Betweenness')
     plt.title("Timestamp: " + str(timestamp), fontsize=12)
+    plt.legend().remove()
     Path(str(timestamp) + "/plots/gini").mkdir(parents=True, exist_ok=True)
     filePath = cwd + "/" + str(timestamp) + '/plots/gini/gini_curve.png'
     plt.savefig(filePath, bbox_inches='tight', dpi=400)
     plt.show()
 
 
-def plot_ginis_bar(timestamps, ginis):
-    df = pd.DataFrame({'Timestamps': timestamps, 'Gini': ginis})
-    ax = df.plot.bar(x='Timestamps', y='Gini', rot=20, ylim=(0, 1), width=0.9)
+def plot_ginis_bar(dates, ginis):
+    df = pd.DataFrame({'Dates': dates, 'Gini': ginis})
+    ax = df.plot.bar(x='Dates', y='Gini', rot=20, ylim=(0.7, 1), width=0.9,
+                     color=['#ffffb2', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#b10026'])
     # Labels above bars
     x_offset = 0
     y_offset = 0
     for p in ax.patches:
         b = p.get_bbox()
-        val = "{:.2f}".format(b.y1 + b.y0)
+        val = "{:.2f}".format((b.y1 + b.y0) * 100) + "%"
         ax.annotate(val, ((b.x0 + b.x1) / 2 + x_offset, b.y1 + y_offset), horizontalalignment='center',
                     verticalalignment='bottom', rotation=0, fontsize=9)
     ax.set_xlabel('Timestamps')
@@ -59,7 +61,7 @@ def plot_ginis_bar(timestamps, ginis):
     ax.get_legend().remove()
     plt.title('')
     Path("plots/gini").mkdir(parents=True, exist_ok=True)
-    filePath = cwd + '/plots/gini/ginis.png'
+    filePath = cwd + '/plots/gini/ginis_2.png'
     plt.savefig(filePath, bbox_inches='tight', dpi=400)
     plt.show()
 
@@ -74,7 +76,7 @@ timestamps = [
     1609498800
 ]
 
-timestamp = timestamps[0]
+timestamp = timestamps[6]
 baseAmount = [10000000, 1000000000, 10000000000]
 
 cwd = str(Path().resolve())
@@ -94,6 +96,7 @@ for b1, b2, b3 in zip(betweenness, betweenness_2, betweenness_3):
 
 # Calc Gini Coefficient from Lorenz Curve per timestamp
 decentiles, betweenness_percentiles = calc_betweenness_percent(avg_betwenness)
+print(decentiles, betweenness_percentiles)
 # plot_gini_curve(decentiles, betweenness_percentiles)
 
 # Calc all Gini Coefficient from all timestamps and plot as bar chart
@@ -103,5 +106,5 @@ for timestamp in timestamps:
     df = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount[0]) + '/' + filenames[3])
     ginis.append(gini(df['betweenness']))
 
-plot_ginis_bar(timestamps, ginis)
-
+dates = ['01.Apr 2019', '01.Aug 2019', '01.Nov 2019', '01.Apr 2020', '01.Aug 2020', '01.Dec 2020', '01.Jan 2021']
+plot_ginis_bar(dates, ginis)
