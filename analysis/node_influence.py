@@ -36,7 +36,7 @@ def plot_line(betweenness_percentages, percentage, dates):
     plt.title('Top ' + str(percentage*100) + '% nodes betweenness share' )
     Path("plots/top").mkdir(parents=True, exist_ok=True)
     filePath = cwd + '/plots/top/top_line_' + str(percentage) + '.png'
-    plt.savefig(filePath, bbox_inches='tight', dpi=400)
+    # plt.savefig(filePath, bbox_inches='tight', dpi=400)
     plt.show()
 
 
@@ -53,7 +53,7 @@ timestamps = [
 # timestamp = timestamps[3]
 
 top_betweenness_percentages = list()
-percentage = 0.10
+percentage = 0.001
 dates = ['01.Apr 2019', '01.Aug 2019', '01.Nov 2019', '01.Apr 2020', '01.Aug 2020', '01.Dec 2020', '01.Jan 2021']
 for timestamp in timestamps:
     baseAmount = [10000000, 1000000000, 10000000000]
