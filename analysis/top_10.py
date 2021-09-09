@@ -4,12 +4,18 @@ from pathlib import Path
 import numpy as np
 import os
 
-def plot_line(df, timestamps, name):
+def plot_line(df, timestamps, name, reverse=False):
 
     ranks = list()
     for i in range(len(df)):
         node_ranks = list(df.iloc[i])
-        ranks.append(node_ranks[2:])
+        if reverse == True:
+            n = node_ranks[2:]
+            n.reverse()
+            ranks.append(n)
+        else:
+            ranks.append(node_ranks[2:])
+
     # fig = plt.figure()
     # ax = fig.add_axes([0, 0, 1, 1])
     plt.ylim(0, 50)
@@ -48,5 +54,5 @@ df_newest = pd.read_csv(filepath_newest)
 df_oldest = pd.read_csv(filepath_oldest)
 
 plot_line(df_newest, timestamps_short, 'newest')
-timestamps_short.reverse()
-plot_line(df_oldest, timestamps_short, 'oldest')
+# timestamps_short.reverse()
+plot_line(df_oldest, timestamps_short, 'oldest', reverse=True)
