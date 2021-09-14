@@ -25,18 +25,19 @@ def plot_line(betweenness_percentages, percentage, dates):
     ax = df_plot.plot.area(ylim=(0.65, 1), rot=20, alpha=0.65, stacked=False, color=['red'])
     # Annotate
     for i in range(len(dates)):
-        ax.annotate('{:.2f}'.format(betweenness_percentages[i] * 100) + '%', xytext=(i - 0.3, betweenness_percentages[i] + 0.05),
-                    xy=(i, betweenness_percentages[i]), arrowprops=dict(arrowstyle='->'), fontsize=8, color='black')
+        ax.annotate('{:.1f}'.format(betweenness_percentages[i] * 100) + '%', xytext=(i - 0.2, betweenness_percentages[i] + 0.02),
+                    xy=(i, betweenness_percentages[i]), arrowprops=dict(arrowstyle='-'),fontsize=20, color='black',
+                    rotation=90)
 
-    plt.xticks()
-    plt.yticks()
-    ax.set_xlabel('Timestamps')
-    ax.set_ylabel('Percentage')
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    ax.set_xlabel('Timestamps', fontsize=20)
+    ax.set_ylabel('Share of Centrality in %', fontsize=20)
     ax.get_legend().remove()
-    plt.title('Top ' + str(percentage*100) + '% nodes betweenness share' )
+    # plt.title('Top ' + str(percentage*100) + '% nodes betweenness share' )
     Path("plots/top").mkdir(parents=True, exist_ok=True)
     filePath = cwd + '/plots/top/top_line_' + str(percentage) + '.png'
-    # plt.savefig(filePath, bbox_inches='tight', dpi=400)
+    plt.savefig(filePath, bbox_inches='tight', dpi=400)
     plt.show()
 
 
@@ -53,8 +54,8 @@ timestamps = [
 # timestamp = timestamps[3]
 
 top_betweenness_percentages = list()
-percentage = 0.001
-dates = ['01.Apr 2019', '01.Aug 2019', '01.Nov 2019', '01.Apr 2020', '01.Aug 2020', '01.Dec 2020', '01.Jan 2021']
+percentage =0.1
+dates = ['01 Apr. 2019', '01 Aug. 2019', '01 Nov. 2019', '01 Apr. 2020', '01 Aug. 2020', '01 Dec. 2020', '01 Jan. 2021']
 for timestamp in timestamps:
     baseAmount = [10000000, 1000000000, 10000000000]
 

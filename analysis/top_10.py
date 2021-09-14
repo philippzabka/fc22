@@ -5,7 +5,6 @@ import numpy as np
 import os
 
 def plot_line(df, timestamps, name, reverse=False):
-
     ranks = list()
     for i in range(len(df)):
         node_ranks = list(df.iloc[i])
@@ -26,9 +25,10 @@ def plot_line(df, timestamps, name, reverse=False):
         plt.bar(x + bar_padding, ranks[i], label="N" + str(i+1), width=width)
         bar_padding += 0.08
     plt.legend(loc=0)
-    plt.xticks(ticks=x, labels=timestamps)
-    plt.xlabel('Timestamps')
-    plt.ylabel('Rank')
+    plt.xticks(ticks=x, labels=timestamps, fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.xlabel('Timestamps', fontsize=20)
+    plt.ylabel('Rank', fontsize=20)
     Path("plots/top").mkdir(parents=True, exist_ok=True)
     filePath = cwd + '/plots/top/top_10_' + name + '.png'
     plt.savefig(filePath, bbox_inches='tight', dpi=400)
@@ -53,6 +53,6 @@ filepath_oldest = cwd + '/top_10_oldest.csv'
 df_newest = pd.read_csv(filepath_newest)
 df_oldest = pd.read_csv(filepath_oldest)
 
+timestamps_short.reverse()
 plot_line(df_newest, timestamps_short, 'newest')
-# timestamps_short.reverse()
 plot_line(df_oldest, timestamps_short, 'oldest', reverse=True)

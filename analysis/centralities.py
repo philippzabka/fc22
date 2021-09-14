@@ -310,14 +310,16 @@ def plot_bt_cdf(df, df2, df3, timestamp, baseAmount):
         # If last element in list make log scale x-axis
         if index == len(ranges) - 1:
             plt.xscale('log')
-        plt.plot(r, y, label="0,0001 BTC")
-        plt.plot(r2, y2, label="0,01 BTC")
-        plt.plot(r3, y3, label="0,1 BTC")
-        plt.legend(loc=4)
-        plt.xlabel('Node Betweenness')
-        plt.ylabel('Percentage')
+        plt.plot(r, y, label="0,0001 BTC", linewidth=3)
+        plt.plot(r2, y2, label="0,01 BTC", linewidth=3)
+        plt.plot(r3, y3, label="0,1 BTC", linewidth=3)
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.legend(loc=0, fontsize=19)
+        plt.xlabel('Centrality', fontsize=20)
+        plt.ylabel('Share of Nodes in %', fontsize=20)
         # plt.title("Timestamp: " + str(timestamp) + ", Range: " + title + ", Base: " + str(base_amount), fontsize=10)
-        plt.title("Timestamp: " + str(timestamp), fontsize=12)
+        # plt.title("Timestamp: " + str(timestamp), fontsize=12)
         plt.savefig(filePath, bbox_inches='tight', dpi=400)
         plt.show()
 
@@ -350,7 +352,7 @@ def plot_bt_histogram(df, df2, df3,  timestamp, baseAmount, bins=10):
         }, columns=["0,0001 BTC", "0,01 BTC", "0,1 BTC"],)
         plt.figure()
         ax = df.plot.hist(bins=bins, edgecolor='black', linewidth=1.2, grid=False, stacked=True, alpha=1)
-        ax.set_ylabel('#Nodes')
+        ax.set_ylabel('Share of Nodes')
         ax.set_xlabel('Node betweennees')
         filePath = cwd + "/" + str(timestamp) + '/plots/histogram/hist_' + str(index) + '_grp.png'
         plt.title("Timestamp: " + str(timestamp), fontsize=12)
@@ -372,9 +374,6 @@ def plot_cluster_histogram(df_plot, timestamp, bins=10):
 
 
 timestamps = [
-    1522576800,
-    1533117600,
-    1543662000,
     1554112800,
     1564653600,
     1572606000,
@@ -384,7 +383,7 @@ timestamps = [
     1609498800
 ]
 
-timestamp = timestamps[5]
+timestamp = timestamps[0]
 baseAmount = 10000000
 # 10000000 -> 0,0001 BTC -> 3€ *
 # 100000000 -> 0,001 BTC -> 32€
@@ -409,7 +408,7 @@ df_plot_3 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount3) + '/
 
 
 plot_bt_cdf(df_plot, df_plot_2, df_plot_3, timestamp, baseAmount)
-plot_bt_histogram(df_plot, df_plot_2, df_plot_3, timestamp, baseAmount, 20)
+# plot_bt_histogram(df_plot, df_plot_2, df_plot_3, timestamp, baseAmount, 20)
 # plot_cluster_histgram(df_plot, graphTimestamp, 20)
 
 # Test
