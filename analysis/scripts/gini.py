@@ -66,8 +66,8 @@ def plot_ginis_bar(dates, ginis):
     plt.yticks(fontsize=20)
     ax.get_legend().remove()
     plt.title('')
-    Path("plots/gini").mkdir(parents=True, exist_ok=True)
-    filePath = cwd + '/plots/gini/ginis_2.png'
+    Path("../plots/gini").mkdir(parents=True, exist_ok=True)
+    filePath = cwd + '/plots/gini/ginis.png'
     plt.savefig(filePath, bbox_inches='tight', dpi=400)
     plt.show()
 
@@ -113,5 +113,4 @@ for timestamp in timestamps:
     ginis.append(gini(df['betweenness']))
 
 timestamps_short = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
-dates = ['01 Apr. 2019', '01 Aug. 2019', '01 Nov. 2019', '01 Apr. 2020', '01 Aug. 2020', '01 Dec. 2020', '01 Jan. 2021']
 plot_ginis_bar(timestamps_short, ginis)

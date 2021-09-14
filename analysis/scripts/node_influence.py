@@ -35,7 +35,7 @@ def plot_line(betweenness_percentages, percentage, dates):
     ax.set_ylabel('Share of Centrality in %', fontsize=20)
     ax.get_legend().remove()
     # plt.title('Top ' + str(percentage*100) + '% nodes betweenness share' )
-    Path("plots/top").mkdir(parents=True, exist_ok=True)
+    Path("../plots/top").mkdir(parents=True, exist_ok=True)
     filePath = cwd + '/plots/top/top_line_' + str(percentage) + '.png'
     plt.savefig(filePath, bbox_inches='tight', dpi=400)
     plt.show()

@@ -284,7 +284,7 @@ def splitBetweennessIntoRanges(df):
     return ranges, titles
 
 
-def plot_bt_cdf(df, df2, df3, timestamp, baseAmount):
+def plot_bt_cdf(df, df2, df3, timestamp):
     ranges, titles = splitBetweennessIntoRanges(df)
     ranges2, titles = splitBetweennessIntoRanges(df2)
     ranges3, titles = splitBetweennessIntoRanges(df3)
@@ -324,7 +324,7 @@ def plot_bt_cdf(df, df2, df3, timestamp, baseAmount):
         plt.show()
 
 
-def plot_bt_histogram(df, df2, df3,  timestamp, baseAmount, bins=10):
+def plot_bt_histogram(df, df2, df3,  timestamp, bins=10):
     ranges, titles = splitBetweennessIntoRanges(df)
     ranges2, titles = splitBetweennessIntoRanges(df2)
     ranges3, titles = splitBetweennessIntoRanges(df3)
@@ -383,7 +383,7 @@ timestamps = [
     1609498800
 ]
 
-timestamp = timestamps[0]
+timestamp = timestamps[6]
 baseAmount = 10000000
 # 10000000 -> 0,0001 BTC -> 3€ *
 # 100000000 -> 0,001 BTC -> 32€
@@ -407,8 +407,8 @@ df_plot_2 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount2) + '/
 df_plot_3 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount3) + '/' + filenames[3])
 
 
-plot_bt_cdf(df_plot, df_plot_2, df_plot_3, timestamp, baseAmount)
-# plot_bt_histogram(df_plot, df_plot_2, df_plot_3, timestamp, baseAmount, 20)
+plot_bt_cdf(df_plot, df_plot_2, df_plot_3, timestamp)
+# plot_bt_histogram(df_plot, df_plot_2, df_plot_3, timestamp, 20)
 # plot_cluster_histgram(df_plot, graphTimestamp, 20)
 
 # Test

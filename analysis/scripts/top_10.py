@@ -29,7 +29,7 @@ def plot_line(df, timestamps, name, reverse=False):
     plt.yticks(fontsize=20)
     plt.xlabel('Timestamps', fontsize=20)
     plt.ylabel('Rank', fontsize=20)
-    Path("plots/top").mkdir(parents=True, exist_ok=True)
+    Path("../plots/top").mkdir(parents=True, exist_ok=True)
     filePath = cwd + '/plots/top/top_10_' + name + '.png'
     plt.savefig(filePath, bbox_inches='tight', dpi=400)
     plt.show()
