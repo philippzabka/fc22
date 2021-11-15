@@ -54,9 +54,7 @@ if __name__ == "__main__":
                         datefmt="%H:%M:%S")
 
     filepath = '../graphs'
-    # filenames = next(os.walk(filepath), (None, None, []))[2]  # [] if no file
-    filenames = ['1564653600_lngraph.graphml', '1572606000_lngraph.graphml', '1585735200_lngraph.graphml',
-                 '1596276000_lngraph.graphml', '1606820400_lngraph.graphml', '1609498800_lngraph.graphml']
+    filenames = next(os.walk(filepath), (None, None, []))[2]  # [] if no file
 
     threads = list()
     for index in range(len(filenames)):
