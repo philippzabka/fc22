@@ -10,7 +10,7 @@ def calc_betweenness_centrality(G):
     return nx.betweenness_centrality(G, weight="weight", normalized=False)
 
 
-def createGraphFromGraphML(filePath, baseAmount):
+def create_graph_from_graphml(filePath, baseAmount):
     g = nx.read_graphml(filePath)
     G = nx.DiGraph()
 
@@ -31,9 +31,8 @@ def createGraphFromGraphML(filePath, baseAmount):
     return G
 
 
-# Init all necessary calculations
-def initProcess(timestamp, baseAmount, filePath):
-    G = createGraphFromGraphML(filePath, baseAmount)
+def init_process(timestamp, baseAmount, filePath):
+    G = create_graph_from_graphml(filePath, baseAmount)
 
     Path(str(timestamp) + "/" + str(baseAmount)).mkdir(parents=True, exist_ok=True)
     cwd = str(Path().resolve())
@@ -49,7 +48,7 @@ def initProcess(timestamp, baseAmount, filePath):
         pass
 
 
-def splitBetweennessIntoRanges(df):
+def split_betweenness_into_ranges(df):
     data = df['betweenness'].values
     data.sort()
 
@@ -68,9 +67,9 @@ def splitBetweennessIntoRanges(df):
 
 
 def plot_bt_cdf(df, df2, df3, timestamp):
-    ranges, titles = splitBetweennessIntoRanges(df)
-    ranges2, titles = splitBetweennessIntoRanges(df2)
-    ranges3, titles = splitBetweennessIntoRanges(df3)
+    ranges, titles = split_betweenness_into_ranges(df)
+    ranges2, titles = split_betweenness_into_ranges(df2)
+    ranges3, titles = split_betweenness_into_ranges(df3)
 
     # Path(str(timestamp) + "/" + str(baseAmount) + "/plots/cdf").mkdir(parents=True, exist_ok=True)
     Path(str(timestamp) + "/plots/cdf").mkdir(parents=True, exist_ok=True)
@@ -115,23 +114,19 @@ timestamps = [
     1609498800
 ]
 
-timestamp = timestamps[6]
-baseAmount = 10000000
-# 10000000 -> 0,0001 BTC -> 3€ *
-# 100000000 -> 0,001 BTC -> 32€
-# 1000000000 -> 0,01 BTC -> 320€ *
-# 10000000000 -> 0,1 BTC -> 3200€ *
-# 100000000000 ->  1 BTC ->  32000€
+baseAmounts = [10000000, 1000000000, 10000000000]
 
-filePath = '../graphs/' + str(timestamp) + '_lngraph.graphml'
-initProcess(timestamp, baseAmount, filePath)
+for timestamp in timestamps:
+    for baseAmount in baseAmounts:
+        filePath = '../graphs/' + str(timestamp) + '_lngraph.graphml'
+        init_process(timestamp, baseAmount, filePath)
 
-print(timestamp)
+
+
 cwd = str(Path().resolve())
 filepath = cwd + '/' + str(timestamp) + '/' + str(baseAmount)
 filenames = next(os.walk(filepath), (None, None, []))[2]  # [] if no file
 print(filenames)
-baseAmount, baseAmount2, baseAmount3 = 10000000, 1000000000, 10000000000
 df_plot = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount) + '/' + filenames[3])
 df_plot_2 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount2) + '/' + filenames[3])
 df_plot_3 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount3) + '/' + filenames[3])
