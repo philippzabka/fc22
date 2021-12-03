@@ -15,8 +15,6 @@ def plot_line(df, timestamps, name, reverse=False):
         else:
             ranks.append(node_ranks[2:])
 
-    # fig = plt.figure()
-    # ax = fig.add_axes([0, 0, 1, 1])
     plt.ylim(0, 50)
     width = 0.08  # the width of the bars
     x = np.arange(len(timestamps))
