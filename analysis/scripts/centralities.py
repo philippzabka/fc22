@@ -35,7 +35,7 @@ def init_process(timestamp, baseAmount, filePath):
     G = create_graph_from_graphml(filePath, baseAmount)
 
     Path(str(timestamp) + "/" + str(baseAmount)).mkdir(parents=True, exist_ok=True)
-    cwd = str(Path().resolve())
+    cwd = str(Path().resolve().parent)
 
     try:
         betweenness = calc_betweenness_centrality(G)
@@ -71,9 +71,8 @@ def plot_bt_cdf(df, df2, df3, timestamp):
     ranges2, titles = split_betweenness_into_ranges(df2)
     ranges3, titles = split_betweenness_into_ranges(df3)
 
-    # Path(str(timestamp) + "/" + str(baseAmount) + "/plots/cdf").mkdir(parents=True, exist_ok=True)
     Path(str(timestamp) + "/plots/cdf").mkdir(parents=True, exist_ok=True)
-    cwd = str(Path().resolve())
+    cwd = str(Path().resolve().parent)
 
     for r, r2, r3, title, index in zip(ranges, ranges2, ranges3, titles, range(len(ranges))):
         y, y2, y3 = np.zeros(len(r)), np.zeros(len(r2)), np.zeros(len(r3))
@@ -87,7 +86,6 @@ def plot_bt_cdf(df, df2, df3, timestamp):
             y3[i] = (i + 1) / len(y3)
         plt.ylim(0, 1)
 
-        # filePath = cwd + "/" + str(timestamp) + '/' + str(baseAmount) + '/plots/cdf/cdf_' + str(index) + 'grp.png'
         filePath = cwd + "/" + str(timestamp) + '/plots/cdf/cdf_' + str(index) + '_grp.png'
         # If last element in list make log scale x-axis
         if index == len(ranges) - 1:
@@ -105,12 +103,12 @@ def plot_bt_cdf(df, df2, df3, timestamp):
 
 
 timestamps = [
-    1554112800,
-    1564653600,
-    1572606000,
-    1585735200,
-    1596276000,
-    1606820400,
+    # 1554112800,
+    # 1564653600,
+    # 1572606000,
+    # 1585735200,
+    # 1596276000,
+    # 1606820400,
     1609498800
 ]
 
@@ -118,18 +116,16 @@ baseAmounts = [10000000, 1000000000, 10000000000]
 
 for timestamp in timestamps:
     for baseAmount in baseAmounts:
-        filePath = '../graphs/' + str(timestamp) + '_lngraph.graphml'
+        pass
+        filePath = '../../graphs/' + str(timestamp) + '_lngraph.graphml'
         init_process(timestamp, baseAmount, filePath)
 
+    cwd = str(Path().resolve().parent)
+    filepath = cwd + '/' + str(timestamp) + '/' + str(baseAmounts[0])
+    filenames = next(os.walk(filepath), (None, None, []))[2]
+    df_plot = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmounts[0]) + '/' + filenames[0])
+    df_plot_2 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmounts[1]) + '/' + filenames[0])
+    df_plot_3 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmounts[2]) + '/' + filenames[0])
+    plot_bt_cdf(df_plot, df_plot_2, df_plot_3, timestamp)
 
 
-cwd = str(Path().resolve())
-filepath = cwd + '/' + str(timestamp) + '/' + str(baseAmount)
-filenames = next(os.walk(filepath), (None, None, []))[2]  # [] if no file
-print(filenames)
-df_plot = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount) + '/' + filenames[3])
-df_plot_2 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount2) + '/' + filenames[3])
-df_plot_3 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount3) + '/' + filenames[3])
-
-
-plot_bt_cdf(df_plot, df_plot_2, df_plot_3, timestamp)
