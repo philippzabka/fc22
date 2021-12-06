@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 import numpy as np
-import os
+
 
 def plot_line(df, timestamps, name, reverse=False):
     ranks = list()
@@ -16,7 +16,7 @@ def plot_line(df, timestamps, name, reverse=False):
             ranks.append(node_ranks[2:])
 
     plt.ylim(0, 50)
-    width = 0.08  # the width of the bars
+    width = 0.08
     x = np.arange(len(timestamps))
     bar_padding = 0
     for i in range(len(ranks)):
@@ -27,7 +27,7 @@ def plot_line(df, timestamps, name, reverse=False):
     plt.yticks(fontsize=20)
     plt.xlabel('Timestamps', fontsize=20)
     plt.ylabel('Rank', fontsize=20)
-    Path("../plots/top").mkdir(parents=True, exist_ok=True)
+    Path("plots/top").mkdir(parents=True, exist_ok=True)
     filePath = cwd + '/plots/top/top_10_' + name + '.png'
     plt.savefig(filePath, bbox_inches='tight', dpi=400)
     plt.show()
@@ -45,8 +45,8 @@ timestamps = [
 
 timestamps_short = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 cwd = str(Path().resolve())
-filepath_newest = cwd + '/top_10_newest.csv'
-filepath_oldest = cwd + '/top_10_oldest.csv'
+filepath_newest = cwd + '/top_10/top_10_newest.csv'
+filepath_oldest = cwd + '/top_10/top_10_oldest.csv'
 
 df_newest = pd.read_csv(filepath_newest)
 df_oldest = pd.read_csv(filepath_oldest)

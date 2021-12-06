@@ -13,13 +13,11 @@ def calc_top_percent(betweenness_list, percent):
         sum_top_betweenness += betweenness_list[i]
 
     top_percent_betweenness = sum_top_betweenness / sum_total_betweenness
-    print(top_percent_betweenness)
     return top_percent_betweenness
 
 
 def plot_line(betweenness_percentages, percentage, dates):
     plt.figure()
-    # timestamps = [str(i) for i in timestamps]
     df_plot = pd.DataFrame({'bt_percentage': betweenness_percentages}, index=dates)
 
     ax = df_plot.plot.area(ylim=(0.65, 1), rot=20, alpha=0.65, stacked=False, color=['red'])
@@ -34,10 +32,9 @@ def plot_line(betweenness_percentages, percentage, dates):
     ax.set_xlabel('Timestamps', fontsize=20)
     ax.set_ylabel('Share of Centrality in %', fontsize=20)
     ax.get_legend().remove()
-    # plt.title('Top ' + str(percentage*100) + '% nodes betweenness share' )
-    Path("../plots/top").mkdir(parents=True, exist_ok=True)
+    Path("plots/top").mkdir(parents=True, exist_ok=True)
     filePath = cwd + '/plots/top/top_line_' + str(percentage) + '.png'
-    plt.savefig(filePath, bbox_inches='tight', dpi=400)
+    # plt.savefig(filePath, bbox_inches='tight', dpi=400)
     plt.show()
 
 
@@ -51,8 +48,6 @@ timestamps = [
     1609498800
 ]
 
-# timestamp = timestamps[3]
-
 top_betweenness_percentages = list()
 percentage =0.1
 dates = ['01 Apr. 2019', '01 Aug. 2019', '01 Nov. 2019', '01 Apr. 2020', '01 Aug. 2020', '01 Dec. 2020', '01 Jan. 2021']
@@ -62,9 +57,9 @@ for timestamp in timestamps:
     cwd = str(Path().resolve())
     filepath = cwd + '/' + str(timestamp) + '/' + str(baseAmount[0])
     filenames = next(os.walk(filepath), (None, None, []))[2]  # [] if no file
-    df = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount[0]) + '/' + filenames[3])
-    df_2 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount[1]) + '/' + filenames[3])
-    df_3 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount[2]) + '/' + filenames[3])
+    df = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount[0]) + '/' + filenames[0])
+    df_2 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount[1]) + '/' + filenames[0])
+    df_3 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount[2]) + '/' + filenames[0])
 
     betweenness = (list(filter(lambda a: a != 0.0, df['betweenness'])))
     betweenness_2 = (list(filter(lambda a: a != 0.0, df_2['betweenness'])))

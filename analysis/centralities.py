@@ -35,7 +35,7 @@ def init_process(timestamp, baseAmount, filePath):
     G = create_graph_from_graphml(filePath, baseAmount)
 
     Path(str(timestamp) + "/" + str(baseAmount)).mkdir(parents=True, exist_ok=True)
-    cwd = str(Path().resolve().parent)
+    cwd = str(Path().resolve())
 
     try:
         betweenness = calc_betweenness_centrality(G)
@@ -72,7 +72,7 @@ def plot_bt_cdf(df, df2, df3, timestamp):
     ranges3, titles = split_betweenness_into_ranges(df3)
 
     Path(str(timestamp) + "/plots/cdf").mkdir(parents=True, exist_ok=True)
-    cwd = str(Path().resolve().parent)
+    cwd = str(Path().resolve())
 
     for r, r2, r3, title, index in zip(ranges, ranges2, ranges3, titles, range(len(ranges))):
         y, y2, y3 = np.zeros(len(r)), np.zeros(len(r2)), np.zeros(len(r3))
@@ -103,24 +103,25 @@ def plot_bt_cdf(df, df2, df3, timestamp):
 
 
 timestamps = [
-    # 1554112800,
-    # 1564653600,
-    # 1572606000,
-    # 1585735200,
-    # 1596276000,
-    # 1606820400,
+    1554112800,
+    1564653600,
+    1572606000,
+    1585735200,
+    1596276000,
+    1606820400,
     1609498800
 ]
 
 baseAmounts = [10000000, 1000000000, 10000000000]
 
+
 for timestamp in timestamps:
     for baseAmount in baseAmounts:
         pass
-        filePath = '../../graphs/' + str(timestamp) + '_lngraph.graphml'
+        filePath = '../graphs/' + str(timestamp) + '_lngraph.graphml'
         init_process(timestamp, baseAmount, filePath)
 
-    cwd = str(Path().resolve().parent)
+    cwd = str(Path().resolve())
     filepath = cwd + '/' + str(timestamp) + '/' + str(baseAmounts[0])
     filenames = next(os.walk(filepath), (None, None, []))[2]
     df_plot = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmounts[0]) + '/' + filenames[0])

@@ -36,11 +36,9 @@ def plot_gini_curve(decentiles, betweennes_percentiles):
     plt.legend(loc=0)
     plt.xlabel('Share of Nodes', fontsize=20, labelpad=20)
     plt.ylabel('Share of Centrality', fontsize=20)
-    # plt.title("Timestamp: " + str(timestamp), fontsize=12)
     plt.xticks(fontsize=20, rotation=0)
     plt.yticks(fontsize=20, rotation=0)
 
-    # plt.legend().remove()
     plt.legend(fontsize=20)
     Path(str(timestamp) + "/plots/gini").mkdir(parents=True, exist_ok=True)
     filePath = cwd + "/" + str(timestamp) + '/plots/gini/gini_curve.png'
@@ -52,7 +50,7 @@ def plot_ginis_bar(dates, ginis):
     df = pd.DataFrame({'Dates': dates, 'Gini': [gini*100 for gini in ginis]})
     ax = df.plot.bar(x='Dates', y='Gini', rot=0, ylim=(70, 100), width=0.9,
                      color=['#ffffb2', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#b10026'])
-    # Labels above bars
+
     x_offset = 0
     y_offset = 0
     for p in ax.patches:
@@ -66,7 +64,7 @@ def plot_ginis_bar(dates, ginis):
     plt.yticks(fontsize=20)
     ax.get_legend().remove()
     plt.title('')
-    Path("../plots/gini").mkdir(parents=True, exist_ok=True)
+    Path("plots/gini").mkdir(parents=True, exist_ok=True)
     filePath = cwd + '/plots/gini/ginis.png'
     plt.savefig(filePath, bbox_inches='tight', dpi=400)
     plt.show()
@@ -82,35 +80,29 @@ timestamps = [
     1609498800
 ]
 
-timestamp = timestamps[0]
-baseAmount = [10000000, 1000000000, 10000000000]
-
+baseAmounts = [10000000, 1000000000, 10000000000]
+ginis = list()
 cwd = str(Path().resolve())
-filepath = cwd + '/' + str(timestamp) + '/' + str(baseAmount[0])
-filenames = next(os.walk(filepath), (None, None, []))[2]  # [] if no file
-df = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount[0]) + '/' + filenames[3])
-df_2 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount[1]) + '/' + filenames[3])
-df_3 = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount[2]) + '/' + filenames[3])
+betweennesses_list = list()
+for timestamp in timestamps:
+    for baseAmount in baseAmounts:
+        filepath = cwd + '/' + str(timestamp) + '/' + str(baseAmount)
+        filenames = next(os.walk(filepath), (None, None, []))[2]  # [] if no file
+        df = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount) + '/' + filenames[0])
+        betweennesses_list.append((list(filter(lambda a: a != 0.0, df['betweenness']))))
+    filepath = cwd + '/' + str(timestamp) + '/' + str(baseAmounts[0])
+    ginis.append(gini(df['betweenness']))
 
-betweenness = (list(filter(lambda a: a != 0.0, df['betweenness'])))
-betweenness_2 = (list(filter(lambda a: a != 0.0, df_2['betweenness'])))
-betweenness_3 = (list(filter(lambda a: a != 0.0, df_3['betweenness'])))
 
 avg_betwenness = list()
-for b1, b2, b3 in zip(betweenness, betweenness_2, betweenness_3):
+for b1, b2, b3 in zip(betweennesses_list[0], betweennesses_list[1], betweennesses_list[2]):
     avg_betwenness.append(np.average([b1, b2, b3]))
 
-# Calc Gini Coefficient from Lorenz Curve per timestamp
 decentiles, betweenness_percentiles = calc_betweenness_percent(avg_betwenness)
-print(decentiles, betweenness_percentiles)
-# plot_gini_curve(decentiles, betweenness_percentiles)
-
-# Calc all Gini Coefficient from all timestamps and plot as bar chart
-ginis = list()
-for timestamp in timestamps:
-    filepath = cwd + '/' + str(timestamp) + '/' + str(baseAmount[0])
-    df = pd.read_csv(cwd + '/' + str(timestamp) + '/' + str(baseAmount[0]) + '/' + filenames[3])
-    ginis.append(gini(df['betweenness']))
+plot_gini_curve(decentiles, betweenness_percentiles)
 
 timestamps_short = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 plot_ginis_bar(timestamps_short, ginis)
+
+
+
