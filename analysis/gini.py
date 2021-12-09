@@ -103,6 +103,3 @@ plot_gini_curve(decentiles, betweenness_percentiles)
 
 timestamps_short = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 plot_ginis_bar(timestamps_short, ginis)
-
-
-

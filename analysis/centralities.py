@@ -114,7 +114,6 @@ timestamps = [
 
 baseAmounts = [10000000, 1000000000, 10000000000]
 
-
 for timestamp in timestamps:
     for baseAmount in baseAmounts:
         pass
